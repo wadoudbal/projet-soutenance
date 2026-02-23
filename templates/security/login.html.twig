@@ -1,0 +1,126 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Connexion - Performance ID{% endblock %}
+
+{% block body %}
+<style>
+    .page-bg {
+        background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), 
+                    url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070&auto=format&fit=crop');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        min-height: 100vh;
+        width: 100vw;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: -1;
+    }
+
+    .login-container {
+        margin-top: 10vh;
+    }
+
+    .form-control {
+        background-color: #2b2b2b !important;
+        border: 1px solid #444 !important;
+        color: #fff !important;
+        border-radius: 0 !important;
+    }
+
+    .form-control:focus {
+        border-color: #ff4d4d !important;
+        box-shadow: none !important;
+    }
+
+    .input-group-text {
+        background-color: #2b2b2b;
+        border: 1px solid #444;
+        color: #888;
+        border-radius: 0;
+        cursor: pointer;
+    }
+
+    .input-group-text:hover {
+        color: #ff4d4d;
+    }
+</style>
+
+<div class="page-bg"></div>
+
+<div class="row justify-content-center login-container">
+    <div class="col-md-5 col-lg-4">
+        <div class="card bg-dark text-white border-0 shadow-lg">
+            <div class="card-header bg-danger text-center py-3 border-0">
+                <h1 class="h3 mb-0 fw-bold text-uppercase">Connexion Athlète</h1>
+            </div>
+
+            <div class="card-body p-4 p-md-5">
+                <form method="post">
+                    {% if error %}
+                        <div class="alert alert-danger rounded-0 border-0 small mb-4">
+                            {{ error.messageKey|trans(error.messageData, 'security') }}
+                        </div>
+                    {% endif %}
+
+                    {% if app.user %}
+                        <div class="mb-3 text-center small">
+                            Vous êtes connecté en tant que {{ app.user.userIdentifier }}, 
+                            <a href="{{ path('app_logout') }}" class="text-danger fw-bold">Déconnexion</a>
+                        </div>
+                    {% endif %}
+
+                    <div class="mb-3">
+                        <label for="inputEmail" class="small text-uppercase fw-bold mb-1 text-muted">Email</label>
+                        <input type="email" value="{{ last_username }}" name="email" id="inputEmail" 
+                               class="form-control" autocomplete="email" required autofocus placeholder="email@exemple.com">
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="inputPassword" class="small text-uppercase fw-bold mb-1 text-muted">Mot de passe</label>
+                        <div class="input-group">
+                            <input type="password" name="password" id="inputPassword" 
+                                   class="form-control" autocomplete="current-password" required placeholder="••••••••">
+                            <span class="input-group-text" id="togglePassword">
+                                <i class="bi bi-eye-fill" id="eyeIcon"></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                    <div class="d-grid mb-4">
+                        <button class="btn btn-danger btn-lg fw-bold text-uppercase rounded-0 py-3 shadow" type="submit">
+                            Se connecter
+                        </button>
+                    </div>
+
+                    <div class="text-center">
+                        <p class="small text-muted mb-0">Pas encore de compte ? 
+                            <a href="{{ path('app_register') }}" class="text-danger fw-bold text-decoration-none">S'inscrire</a>
+                        </p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('togglePassword').addEventListener('click', function () {
+        const passwordInput = document.getElementById('inputPassword');
+        const eyeIcon = document.getElementById('eyeIcon');
+        
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            eyeIcon.classList.remove('bi-eye-fill');
+            eyeIcon.classList.add('bi-eye-slash-fill');
+        } else {
+            passwordInput.type = 'password';
+            eyeIcon.classList.remove('bi-eye-slash-fill');
+            eyeIcon.classList.add('bi-eye-fill');
+        }
+    });
+</script>
+{% endblock %}

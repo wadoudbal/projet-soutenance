@@ -1,0 +1,80 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon Profil Santé - Performance ID{% endblock %}
+
+{% block body %}
+<style>
+    .bebas { font-family: 'Bebas Neue', cursive; letter-spacing: 1px; }
+    .card-dark { background: rgba(15, 15, 15, 0.95); border: 1px solid rgba(255,255,255,0.1); border-top: 4px solid #dc3545; color: white; }
+    .stat-box { background: rgba(255, 255, 255, 0.05); padding: 15px; border-left: 3px solid #dc3545; }
+    .imc-badge { font-family: 'Bebas Neue'; font-size: 1.5rem; padding: 5px 15px; }
+</style>
+
+<div class="container py-5">
+    <div class="row g-4">
+        {# COLONNE GAUCHE : INFOS & SANTÉ #}
+        <div class="col-md-7">
+            <div class="card card-dark p-4 shadow-lg">
+                <h2 class="bebas mb-4"><i class="bi bi-heart-pulse text-danger me-2"></i>Ma Condition <span class="text-danger">Physique</span></h2>
+                
+                {{ form_start(form) }}
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="bebas text-white-50">Prénom / Pseudo</label>
+                        {{ form_widget(form.pseudo, {'attr': {'class': 'form-control bg-dark text-white border-secondary'}}) }}
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="bebas text-white-50">Poids (kg)</label>
+                        {{ form_widget(form.poids, {'attr': {'class': 'form-control bg-dark text-white border-secondary'}}) }}
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="bebas text-white-50">Taille (cm)</label>
+                        {{ form_widget(form.taille, {'attr': {'class': 'form-control bg-dark text-white border-secondary'}}) }}
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-danger bebas w-100 mt-2">Mettre à jour mes données</button>
+                {{ form_end(form) }}
+
+                {# CALCUL IMC EN TEMPS RÉEL #}
+                {% if app.user.poids and app.user.taille %}
+                    {% set imc = app.user.poids / ((app.user.taille / 100) * (app.user.taille / 100)) %}
+                    <div class="mt-5 p-4 border border-secondary border-opacity-25 bg-black bg-opacity-25">
+                        <h4 class="bebas">Ton Indice de Masse Corporelle (IMC)</h4>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="imc-badge {% if imc < 18.5 or imc > 25 %}bg-warning text-dark{% else %}bg-success text-white{% endif %}">
+                                {{ imc|number_format(1) }}
+                            </span>
+                            <p class="mb-0 ms-3 small text-white-50">
+                                {% if imc < 18.5 %}Poids insuffisant{% elseif imc < 25 %}Poids normal (Optimal){% elseif imc < 30 %}Surpoids{% else %}Obésité{% endif %}
+                            </p>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {# COLONNE DROITE : SÉCURITÉ 2FA #}
+        <div class="col-md-5">
+            <div class="card card-dark p-4 shadow-lg mb-4" style="border-top-color: #ffc107;">
+                <h2 class="bebas mb-4"><i class="bi bi-shield-lock text-warning me-2"></i>Sécurité <span class="text-warning">2FA</span></h2>
+                <p class="small text-white-50">Protège tes données de performance en activant l'authentification à deux facteurs.</p>
+                
+                <div class="stat-box d-flex align-items-center justify-content-between" style="border-left-color: #ffc107;">
+                    <div>
+                        <div class="fw-bold">Statut : 
+                            <span class="text-danger">DÉSACTIVÉ</span>
+                        </div>
+                    </div>
+                    <a href="#" class="btn btn-sm btn-outline-warning bebas">Activer</a>
+                </div>
+                
+                <div class="mt-4 pt-3 border-top border-secondary border-opacity-25 text-center">
+                    <a href="{{ path('app_logout') }}" class="btn btn-link text-white-50 text-decoration-none small">
+                        <i class="bi bi-box-arrow-right"></i> Déconnexion sécurisée
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

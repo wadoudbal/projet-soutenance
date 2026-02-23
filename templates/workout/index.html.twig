@@ -1,0 +1,172 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Performance ID - Historique{% endblock %}
+
+{% block body %}
+<style>
+    .bebas { font-family: 'Bebas Neue', cursive; letter-spacing: 1px; }
+
+    /* Fond de page légèrement plus sombre pour faire ressortir le contenu */
+    body {
+        background-color: rgba(0, 0, 0, 0.4); 
+    }
+
+    /* Conteneur de recherche plus contrasté */
+    .glass-search {
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(15px);
+        border: 1px solid #dc3545;
+        padding: 20px;
+        margin-bottom: 40px;
+    }
+
+    /* Séparateur de date très lisible */
+    .date-header {
+        display: flex;
+        align-items: center;
+        margin-top: 30px;
+        margin-bottom: 15px;
+    }
+    .date-header h3 {
+        background: #dc3545;
+        color: white;
+        padding: 5px 15px;
+        font-size: 1.1rem;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    }
+    .date-header hr {
+        flex-grow: 1;
+        border-color: #dc3545;
+        opacity: 1;
+        margin-left: 20px;
+    }
+
+    /* Cartes d'exercices beaucoup plus opaques */
+    .workout-row {
+        background: rgba(15, 15, 15, 0.9) !important; /* Presque noir pour lire le blanc sans effort */
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: 0.3s;
+        margin-bottom: 10px;
+    }
+
+    .workout-row:hover {
+        background: rgba(30, 30, 30, 1) !important;
+        border-color: #dc3545;
+    }
+
+    /* Libellés plus clairs (gris clair au lieu de gris foncé) */
+    .stat-label {
+        font-size: 0.75rem;
+        color: #bbbbbb; 
+        text-transform: uppercase;
+        font-weight: bold;
+        display: block;
+    }
+
+    /* Chiffres avec ombre pour le contraste */
+    .stat-data {
+        font-family: 'Bebas Neue';
+        font-size: 1.6rem;
+        color: #ffffff;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+    }
+
+    .text-warning-custom {
+        color: #ffc107 !important;
+        font-weight: bold;
+    }
+
+    /* Inputs plus lisibles */
+    .form-control::placeholder {
+        color: #aaa !important;
+    }
+</style>
+
+<div class="container py-5">
+    {# EN-TÊTE #}
+    <div class="mb-5">
+        <h4 class="text-danger mb-0 bebas" style="letter-spacing: 3px;">HISTORIQUE D'ENTRAÎNEMENT</h4>
+        <h1 class="bebas display-3 m-0 text-white" style="text-shadow: 2px 4px 10px rgba(0,0,0,0.7);">
+            JOURNAL <span class="text-danger">PERSONNEL</span>
+        </h1>
+    </div>
+
+    {# BARRE DE RECHERCHE #}
+    <div class="glass-search shadow-lg">
+        <form method="get" class="row g-2">
+            <div class="col-md-10">
+                <input type="text" name="q" class="form-control bg-dark text-white border-secondary py-2" 
+                       placeholder="Rechercher un exercice..." value="{{ searchTerm }}">
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-danger w-100 bebas fs-5">FILTRER</button>
+            </div>
+        </form>
+    </div>
+
+    {# LISTE DES SÉANCES #}
+    {% set last_date = null %}
+    {% for workout in workouts %}
+        {% if workout.createdAt|date('d/m/Y') != last_date %}
+            <div class="date-header">
+                <h3 class="bebas m-0">
+                    <i class="bi bi-calendar-check me-2"></i>{{ workout.createdAt|date('d F Y') }}
+                </h3>
+                <hr>
+            </div>
+            {% set last_date = workout.createdAt|date('d/m/Y') %}
+        {% endif %}
+
+        <div class="card workout-row shadow-lg">
+            <div class="card-body py-3">
+                <div class="row align-items-center">
+                    {# Heure #}
+                    <div class="col-md-1 border-end border-secondary">
+                        <span class="text-white fw-bold">{{ workout.createdAt|date('H:i') }}</span>
+                    </div>
+
+                    {# Exercice #}
+                    <div class="col-md-4 ps-4">
+                        <div class="bebas h4 mb-0 text-white">{{ workout.exercise.name }}</div>
+                        <small class="text-danger fw-bold text-uppercase" style="font-size: 0.7rem;">
+                            {{ workout.name|default('Série standard') }}
+                        </small>
+                    </div>
+
+                    {# Valeurs #}
+                    <div class="col-md-5">
+                        <div class="row">
+                            <div class="col-4 stat-box text-center">
+                                <span class="stat-label">Série</span>
+                                <span class="stat-data">{{ workout.serie }}</span>
+                            </div>
+                            <div class="col-4 stat-box text-center border-start border-end border-secondary">
+                                <span class="stat-label">Charge</span>
+                                <span class="stat-data text-warning-custom">{{ workout.weight }} KG</span>
+                            </div>
+                            <div class="col-4 stat-box text-center">
+                                <span class="stat-label">Répétitions</span>
+                                <span class="stat-data">{{ workout.reps }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {# Actions #}
+                    <div class="col-md-2 text-end">
+                        <div class="d-flex justify-content-end align-items-center">
+                            <a href="{{ path('app_workout_edit', {'id': workout.id}) }}" class="btn btn-outline-info btn-sm me-2">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
+                            {{ include('workout/_delete_form.html.twig') }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="text-center py-5 bg-dark bg-opacity-50 rounded">
+            <p class="text-white bebas h4">Aucune séance enregistrée pour le moment.</p>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

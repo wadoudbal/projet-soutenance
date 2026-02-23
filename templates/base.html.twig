@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>{% block title %}Performance ID{% endblock %}</title>
+        
+        {# CSS #}
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+        
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@400;700&display=swap');
+
+            body { 
+                background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.9)), 
+                            url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070&auto=format&fit=crop') no-repeat center center fixed !important;
+                background-size: cover !important;
+                color: #ffffff;
+                font-family: 'Roboto', sans-serif;
+                min-height: 100vh;
+                margin: 0;
+            }
+            
+            .navbar { 
+                background-color: rgba(0, 0, 0, 0.95) !important;
+                border-bottom: 2px solid #dc3545; 
+                backdrop-filter: blur(10px);
+                padding: 0.8rem 0;
+            }
+            
+            .navbar-brand { 
+                font-family: 'Bebas Neue', cursive; 
+                font-size: 2.2rem;
+                color: #dc3545 !important;
+            }
+            .navbar-brand span { color: #fff; }
+
+            .nav-link { 
+                font-family: 'Bebas Neue', cursive; 
+                text-transform: uppercase; 
+                font-size: 1.2rem;
+                letter-spacing: 1px;
+                margin: 0 15px;
+                color: #ffffff !important;
+            }
+            .nav-link:hover, .nav-link.active { color: #dc3545 !important; }
+
+            h1, h2, h3, h4 { font-family: 'Bebas Neue', cursive; text-transform: uppercase; }
+            
+            .btn-danger { background-color: #dc3545; border: none; border-radius: 0; font-family: 'Bebas Neue'; letter-spacing: 1px; }
+        </style>
+        {% block stylesheets %}{% endblock %}
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-lg navbar-dark sticky-top mb-4">
+            <div class="container">
+                <a class="navbar-brand" href="{{ path('app_home') }}">PERFORMANCE <span>ID</span></a>
+                
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <div class="navbar-nav ms-auto align-items-center">
+                        {% if app.user %}
+                            {% if is_granted('ROLE_ADMIN') == false %}
+                                <a class="nav-link {{ app.request.get('_route') == 'app_dashboard' ? 'active' : '' }}" href="{{ path('app_dashboard') }}">Dashboard</a>
+                                <a class="nav-link {{ app.request.get('_route') == 'app_workout_index' ? 'active' : '' }}" href="{{ path('app_workout_index') }}">Historique</a>
+                                
+                                {# LIEN PROFIL MIS À JOUR ICI #}
+                                <a class="nav-link" href="{{ path('app_profile') }}">
+                                    <i class="bi bi-person-circle me-1"></i> Profil
+                                </a>
+                            {% endif %}
+
+                            {% if is_granted('ROLE_ADMIN') %}
+                                <a class="nav-link" href="{{ path('app_exercise_index') }}">Catalogue</a>
+                            {% endif %}
+                            
+                            <a class="btn btn-sm btn-danger ms-lg-4 px-3 fw-bold" href="{{ path('app_logout') }}">DÉCONNEXION</a>
+                        {% else %}
+                            <a class="nav-link" href="{{ path('app_login') }}">Connexion</a>
+                            <a class="btn btn-danger btn-sm ms-lg-2 px-3 fw-bold" href="{{ path('app_register') }}">S'INSCRIRE</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <main>
+            {% block body %}{% endblock %}
+        </main>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        {% block javascripts %}{% endblock %}
+    </body>
+</html>

@@ -1,0 +1,95 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Performance ID - Enregistrer une séance{% endblock %}
+
+{% block body %}
+<style>
+    .bebas { font-family: 'Bebas Neue', cursive; letter-spacing: 1px; }
+
+    /* Conteneur principal plus sombre et contrasté */
+    .card-workout {
+        background: rgba(15, 15, 15, 0.95) !important;
+        backdrop-filter: blur(15px);
+        border: none;
+        border-top: 4px solid #dc3545;
+        border-radius: 0;
+        color: white;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+    }
+
+    /* Libellés et textes d'aide */
+    .text-help { color: #aaaaaa; font-size: 0.95rem; line-height: 1.4; }
+    
+    /* Boutons */
+    .btn-finish { 
+        border-radius: 0; 
+        font-family: 'Bebas Neue', cursive; 
+        letter-spacing: 1px; 
+        transition: 0.3s;
+    }
+
+    /* Style pour le conseil en bas */
+    .tip-box {
+        background: rgba(255, 193, 7, 0.05);
+        border-left: 4px solid #ffc107 !important;
+        border-radius: 0;
+    }
+
+    /* On force la visibilité des labels du formulaire inclus */
+    label {
+        display: block;
+        margin-bottom: 8px;
+        color: #dc3545;
+        font-family: 'Bebas Neue';
+        font-size: 1.2rem;
+        text-transform: uppercase;
+    }
+</style>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            
+            {# CARTE PRINCIPALE #}
+            <div class="card card-workout">
+                <div class="card-header bg-transparent border-bottom border-secondary border-opacity-25 py-4 text-center">
+                    <h1 class="display-5 mb-0 bebas text-white">
+                        NOUVEL EFFORT
+                    </h1>
+                    <div class="text-danger bebas h5">ENREGISTREMENT SÉANCE</div>
+                </div>
+                
+                <div class="card-body p-4 p-md-5">
+                    <p class="text-help mb-4 text-center">
+                        Saisissez les détails de votre exercice. Chaque validation ajoute une ligne à votre journal d'entraînement.
+                    </p>
+
+                    {# FORMULAIRE SYMFONY #}
+                    <div class="workout-form-custom">
+                        {{ include('workout/_form.html.twig', {'button_label': 'VALIDER LA SÉRIE'}) }}
+                    </div>
+
+                    <div class="d-grid gap-2 mt-5">
+                        <a href="{{ path('app_workout_index') }}" class="btn btn-outline-light btn-finish py-3">
+                            <i class="bi bi-journal-text me-2"></i>VOIR MON JOURNAL D'AUJOURD'HUI
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            {# BLOC CONSEIL #}
+            <div class="mt-4 card tip-box border-0 shadow-sm">
+                <div class="card-body py-3">
+                    <p class="mb-0 small text-white">
+                        <span class="text-warning fw-bold text-uppercase">
+                            <i class="bi bi-lightning-fill me-1"></i> Astuce :
+                        </span> 
+                        Utilisez le même <span class="text-warning">"Nom de séance"</span> (ex: "Séance Jambes") pour regrouper tous vos exercices du moment.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

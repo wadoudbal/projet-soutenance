@@ -1,0 +1,56 @@
+{# templates/workout/_form.html.twig #}
+{{ form_start(form) }}
+    <style>
+        .form-input-dark {
+            background: rgba(0, 0, 0, 0.4) !important;
+            border: 1px solid #444 !important;
+            color: white !important;
+            border-radius: 0;
+        }
+        .form-input-dark:focus { border-color: #dc3545 !important; box-shadow: none; }
+        .label-style { font-family: 'Bebas Neue'; letter-spacing: 1px; color: #fff; margin-top: 10px; }
+        select.form-input-dark option { background: #121212; color: white; }
+    </style>
+
+    {# NOM DE LA SÉANCE #}
+    <div class="mb-3">
+        <label class="label-style">Nom de la séance</label>
+        {{ form_widget(form.name, {'attr': {'class': 'form-control form-input-dark'}}) }}
+    </div>
+
+    <div class="row">
+        {# EXERCICE #}
+        <div class="col-md-8 mb-3">
+            <label class="label-style">Exercice</label>
+            {{ form_widget(form.exercise, {'attr': {'class': 'form-select form-input-dark'}}) }}
+        </div>
+        {# SÉRIE #}
+        <div class="col-md-4 mb-3">
+            <label class="label-style">Série</label>
+            {{ form_widget(form.serie, {'attr': {'class': 'form-select form-input-dark'}}) }}
+        </div>
+    </div>
+
+    <div class="row">
+        {# POIDS #}
+        <div class="col-6 mb-3">
+            <label class="label-style">Poids (kg)</label>
+            {{ form_widget(form.weight, {'attr': {'class': 'form-control form-input-dark'}}) }}
+        </div>
+        {# REPS #}
+        <div class="col-6 mb-3">
+            <label class="label-style">Répétitions</label>
+            {{ form_widget(form.reps, {'attr': {'class': 'form-control form-input-dark'}}) }}
+        </div>
+    </div>
+
+    {# DATE (Masquée ou affichée selon ton envie, ici on la garde stylisée) #}
+    <div class="mb-3">
+        <label class="label-style">Date de l'enregistrement</label>
+        {{ form_widget(form.createdAt, {'attr': {'class': 'form-control form-input-dark'}}) }}
+    </div>
+
+    <button class="btn btn-danger w-100 fw-bold py-2 mt-3 text-uppercase" style="font-family: 'Bebas Neue'; font-size: 1.2rem;">
+        <i class="bi bi-check-lg me-2"></i>Enregistrer la série
+    </button>
+{{ form_end(form) }}

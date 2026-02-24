@@ -11,8 +11,14 @@
                     <h2 class="card-title">Sécurisez votre compte</h2>
                     <p class="text-muted">Scannez ce QR Code avec votre application de sécurité (Google Authenticator, Authy, etc.)</p>
                     
-                    <div class="my-4">
-                        <img src="{{ qrCodeUrl }}" alt="QR Code" class="img-fluid border p-2 bg-white">
+                    <div class="my-4 d-flex justify-content-center">
+                        {# On remplace la balise <img> par un conteneur vide que le JS va remplir #}
+                        <div id="qrcode-container" class="border p-3 bg-white shadow-sm"></div>
+                    </div>
+
+                    <div class="mt-3 mb-4">
+                        <p class="small text-muted mb-1">Si vous ne pouvez pas scanner, entrez ce code manuellement :</p>
+                        <kbd style="font-size: 1.2rem; letter-spacing: 2px;">{{ user.googleAuthenticatorSecret }}</kbd>
                     </div>
 
                     <div class="alert alert-warning text-start">
@@ -25,4 +31,22 @@
         </div>
     </div>
 </div>
+
+{# Ajout de la bibliothèque pour générer le QR Code en local #}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+    // On récupère le contenu brut généré par le bundle
+    var qrContent = "{{ qrCodeContent|raw }}";
+    
+    if (qrContent) {
+        new QRCode(document.getElementById("qrcode-container"), {
+            text: qrContent,
+            width: 200,
+            height: 200,
+            colorDark : "#000000",
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.H
+        });
+    }
+</script>
 {% endblock %}

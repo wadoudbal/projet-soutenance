@@ -1,167 +1,83 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Performance ID - Dashboard{% endblock %}
-
 {% block body %}
-<style>
-    /* ON SUPPRIME LE BLOC :host, body { ... } QUI ÉTAIT ICI */
-    /* Cela permet à l'image de base.html.twig de s'afficher enfin partout */
-
-    .welcome-header {
-        border-left: 5px solid #dc3545;
-        padding-left: 25px;
-        margin-bottom: 50px;
-    }
-
-    .card-stat {
-        background: rgba(0, 0, 0, 0.65) !important; 
-        backdrop-filter: blur(15px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        padding: 30px;
-        text-align: center;
-        transition: 0.4s;
-    }
-    
-    .card-stat:hover {
-        background: rgba(220, 53, 69, 0.1) !important;
-        border-color: #dc3545;
-        transform: translateY(-5px);
-    }
-
-    .stat-title {
-        color: #aaa;
-        font-size: 0.8rem;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        margin-bottom: 10px;
-    }
-
-    .stat-number {
-        font-family: 'Bebas Neue';
-        font-size: 3.5rem;
-        line-height: 1;
-    }
-
-    .graph-box {
-        background: rgba(0, 0, 0, 0.4);
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        padding: 25px;
-        height: 300px;
-    }
-
-    .bar-item {
-        background: #dc3545;
-        width: 45px;
-        position: relative;
-        height: var(--bar-height);
-        transition: 0.8s cubic-bezier(0.2, 1, 0.3, 1);
-    }
-
-    .bar-item:hover { 
-        background: #ff1e32; 
-        box-shadow: 0 0 20px rgba(220, 53, 69, 0.6); 
-    }
-
-    .bar-val {
-        position: absolute;
-        top: -30px;
-        left: 50%;
-        transform: translateX(-50%);
-        font-family: 'Bebas Neue';
-        font-size: 1.1rem;
-    }
-</style>
-
-<div class="container py-4">
-    {# HEADER BIENVENUE #}
-    <div class="row align-items-center mb-5">
-        <div class="col-md-8 welcome-header">
-            <h4 class="text-danger mb-0 text-uppercase" style="letter-spacing: 3px;">Athlete Dashboard</h4>
-            <h1 class="display-3 fw-bold m-0 text-white">
-                BIENVENUE, {{ app.user.userIdentifier|split('@')[0]|upper }}
-            </h1>
+<div class="container">
+    {# 1. ACCUEIL #}
+    <div class="row mb-5 align-items-center">
+        <div class="col-md-8 text-center text-md-start">
+            <h1 class="display-4 fw-bold text-white">SALUT, {{ app.user.userIdentifier|split('@')[0]|upper }}</h1>
+            <p class="text-danger fw-bold text-uppercase mb-4 mb-md-0" style="letter-spacing: 2px;">Prêt pour ta prochaine performance ?</p>
         </div>
         <div class="col-md-4 text-md-end">
-            {# CHANGEMENT : SÉANCE AU LIEU DE SÉRIE #}
-            <a href="{{ path('app_workout_new') }}" class="btn btn-danger btn-lg px-5 py-3 fs-4 shadow-lg border-0 rounded-0">
-                <i class="bi bi-plus-lg me-2"></i>NOUVELLE SÉANCE
+            <a href="{{ path('app_workout_new') }}" class="btn btn-danger btn-lg w-100 w-md-auto fw-bold rounded-0 shadow-lg">
+                <i class="bi bi-plus-circle me-2"></i>ENREGISTRER UNE SÉANCE
             </a>
         </div>
     </div>
 
-    {# STATS BLOCKS #}
-    <div class="row g-4 mb-5">
-        <div class="col-md-3">
-            <div class="card-stat">
-                <div class="stat-title">Volume Total</div>
-                <div class="stat-number text-danger">{{ totalVolume|number_format(0, ',', ' ') }}</div>
-                <div class="small text-white-50">KILOGRAMMES</div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card-stat">
-                <div class="stat-title">Séances</div>
-                <div class="stat-number text-white">{{ workoutCount }}</div>
-                <div class="small text-white-50">COMPLÉTÉES</div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card-stat">
-                <div class="stat-title">Séries</div>
-                <div class="stat-number text-white">{{ allWorkouts|length }}</div>
-                <div class="small text-white-50">TOTALES</div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card-stat">
-                <div class="stat-title">Dernière Charge</div>
-                <div class="stat-number text-warning">{{ lastWorkouts|length > 0 ? lastWorkouts[0].weight : 0 }}</div>
-                <div class="small text-white-50">KG SOULEVÉS</div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row g-4">
-        {# GRAPH #}
-        <div class="col-lg-8">
-            <div class="card-stat text-start h-100 p-4">
-                <h4 class="mb-4 text-uppercase text-white"><i class="bi bi-activity text-danger me-2"></i>Analyse d'intensité</h4>
-                <div class="graph-box d-flex align-items-end justify-content-around rounded shadow-sm">
-                    {% for workout in lastWorkouts|reverse %}
-                        {% set pct = (workout.weight / 2) > 100 ? 100 : (workout.weight / 2) %}
-                        <div class="bar-item" style="--bar-height: {{ pct }}%;" 
-                             data-bs-toggle="tooltip" 
-                             title="{{ workout.exercise ? workout.exercise.name : 'Exercice' }}">
-                            <span class="bar-val text-white">{{ workout.weight }}</span>
-                        </div>
-                    {% else %}
-                        <p class="text-white-50 italic">Aucune donnée disponible.</p>
-                    {% endfor %}
+    {# 2. BLOC OBJECTIF #}
+    {% if goal %}
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="p-4" style="background: rgba(0,0,0,0.6); border: 1px solid rgba(220, 53, 69, 0.3); backdrop-filter: blur(10px);">
+                <div class="d-flex justify-content-between align-items-end mb-3">
+                    <div>
+                        <h5 class="text-white-50 small text-uppercase mb-1">Objectif : {{ goal.exercise.name }}</h5>
+                        <h2 class="text-white m-0">{{ goal.targetWeight }} KG</h2>
+                    </div>
+                    <div class="text-danger fw-bold fs-4">{{ pourcentage|round }}%</div>
+                </div>
+                
+                <div class="progress" style="height: 12px; background: rgba(255,255,255,0.1); border-radius: 0;">
+                    <div class="progress-bar bg-danger" id="js-progress-bar" role="progressbar" 
+                         aria-valuenow="{{ pourcentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                
+                <div class="d-flex justify-content-between mt-2 small text-white-50">
+                    <span>Record : <strong>{{ recordAbsolu }} kg</strong></span>
+                    <span>Cible : <strong>{{ goal.targetWeight }} kg</strong></span>
                 </div>
             </div>
         </div>
-
-        {# RECORDS #}
-        <div class="col-lg-4">
-            <div class="card-stat h-100 p-4 text-start">
-                <h4 class="mb-4 border-bottom border-danger pb-2 text-uppercase text-white">Top Records</h4>
-                {% for exercise, weight in personalRecords %}
-                    <div class="d-flex justify-content-between align-items-center mb-3 bg-black bg-opacity-40 p-3 rounded border border-secondary border-opacity-25">
-                        <span class="text-white-50">{{ exercise }}</span>
-                        <span class="h4 m-0 text-warning">{{ weight }} KG</span>
-                    </div>
-                {% else %}
-                    <p class="text-white-50 italic">Aucun record enregistré.</p>
-                {% endfor %}
-            </div>
+    </div>
+    {% else %}
+    <div class="row mb-5">
+        <div class="col-12">
+            <a href="{{ path('app_goal_new') }}" class="btn btn-outline-secondary w-100 py-4 border-dashed text-uppercase">
+                <i class="bi bi-trophy me-2"></i> Aucun objectif défini - Clique ici pour en fixer un
+            </a>
         </div>
     </div>
-</div>
+    {% endif %}
 
+    {# 3. STATS #}
+    <div class="row g-4">
+        {% set stats = [
+            {'label': 'Volume Total', 'val': volumeTotal|number_format(0, ',', ' '), 'unit': 'KG'},
+            {'label': 'Séances / Semaine', 'val': seancesSemaine, 'unit': 'FOIS'},
+            {'label': 'Record Absolu', 'val': recordAbsolu, 'unit': 'KG'}
+        ] %}
+        {% for stat in stats %}
+        <div class="col-md-4">
+            <div class="p-4 h-100" style="background: rgba(0,0,0,0.6); border-left: 4px solid #dc3545;">
+                <div class="text-white-50 small text-uppercase fw-bold mb-2">{{ stat.label }}</div>
+                <div class="h1 m-0 text-white font-bebas" style="font-size: 3rem;">
+                    {{ stat.val }} <span class="fs-5">{{ stat.unit }}</span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-        tooltipTriggerList.map(function (el) { return new bootstrap.Tooltip(el) })
+    document.addEventListener('DOMContentLoaded', () => {
+        const bar = document.getElementById('js-progress-bar');
+        if(bar) {
+            setTimeout(() => { bar.style.width = "{{ pourcentage }}%"; }, 200);
+        }
     });
 </script>
 {% endblock %}

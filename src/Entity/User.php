@@ -7,7 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 // 1. Décommenté : Import nécessaire pour que Symfony reconnaisse le type 2FA
-use Scheb\TwoFactorBundle\Model\Google\GoogleAuthenticatorTwoFactorInterface;
+use Scheb\TwoFactorBundle\Model\Google\TwoFactorInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 #[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
 // 2. Décommenté : On implémente officiellement l'interface
-class User implements UserInterface, PasswordAuthenticatedUserInterface, GoogleAuthenticatorTwoFactorInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFactorInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -56,9 +56,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, GoogleA
     #[ORM\Column(nullable: true)]
     private ?int $taille = null;
 
+    /**
+     * @var Collection<int, Goal>
+     */
+    #[ORM\OneToMany(targetEntity: Goal::class, mappedBy: 'user')]
+    private Collection $goals;
+
     public function __construct()
     {
         $this->workouts = new ArrayCollection();
+        $this->goals = new ArrayCollection();
     }
 
     // --- MÉTHODES OBLIGATOIRES POUR LA 2FA (Google Authenticator) ---
@@ -229,6 +236,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, GoogleA
     public function setTaille(?int $taille): static
     {
         $this->taille = $taille;
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Goal>
+     */
+    public function getGoals(): Collection
+    {
+        return $this->goals;
+    }
+
+    public function addGoal(Goal $goal): static
+    {
+        if (!$this->goals->contains($goal)) {
+            $this->goals->add($goal);
+            $goal->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeGoal(Goal $goal): static
+    {
+        if ($this->goals->removeElement($goal)) {
+            // set the owning side to null (unless already changed)
+            if ($goal->getUser() === $this) {
+                $goal->setUser(null);
+            }
+        }
+
         return $this;
     }
 }

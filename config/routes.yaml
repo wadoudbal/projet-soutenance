@@ -1,21 +1,14 @@
-# yaml-language-server: $schema=../vendor/symfony/routing/Loader/schema/routing.schema.json
-
-# This file is the entry point to configure the routes of your app.
-# Methods with the #[Route] attribute are automatically imported.
-# See also https://symfony.com/doc/current/routing.html
-
-# To list all registered routes, run the following command:
-#   bin/console debug:router
-
-controllers:
-    resource: routing.controllers
-# config/routes.yaml
-
-# Route pour afficher le formulaire de code à 6 chiffres
+# 1. Route pour afficher le formulaire (appelle ton contrôleur)
 2fa_login:
     path: /2fa
-    methods: [GET]
+    controller: App\Controller\TwoFactorController::display2faForm
+    methods: [GET, POST]
 
-# Route invisible qui traite la vérification du code
+# 2. Route pour le traitement (gérée en interne par le bundle)
 2fa_login_check:
     path: /2fa_check
+
+# 3. Importation automatique des attributs #[Route] de tes contrôleurs
+controllers:
+    resource: ../src/Controller/
+    type: attribute

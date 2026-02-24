@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c51aad9eb05e22b195359d0dc01ef214",
+    "content-hash": "c38a0926b84c919fff7a43635615cccd",
     "packages": [
         {
             "name": "composer/semver",
@@ -1965,21 +1965,21 @@
         },
         {
             "name": "scheb/2fa-bundle",
-            "version": "v7.13.1",
+            "version": "v7.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/scheb/2fa-bundle.git",
-                "reference": "edcc14456b508aab37ec792cfc36793d04226784"
+                "reference": "ec492571cf6017107910a1968a6f8f827dd74b77"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/scheb/2fa-bundle/zipball/edcc14456b508aab37ec792cfc36793d04226784",
-                "reference": "edcc14456b508aab37ec792cfc36793d04226784",
+                "url": "https://api.github.com/repos/scheb/2fa-bundle/zipball/ec492571cf6017107910a1968a6f8f827dd74b77",
+                "reference": "ec492571cf6017107910a1968a6f8f827dd74b77",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
-                "php": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
+                "php": "~8.2.0 || ~8.3.0",
                 "symfony/config": "^6.4 || ^7.0",
                 "symfony/dependency-injection": "^6.4 || ^7.0",
                 "symfony/event-dispatcher": "^6.4 || ^7.0",
@@ -1988,7 +1988,6 @@
                 "symfony/http-kernel": "^6.4 || ^7.0",
                 "symfony/property-access": "^6.4 || ^7.0",
                 "symfony/security-bundle": "^6.4 || ^7.0",
-                "symfony/service-contracts": "^2.5|^3",
                 "symfony/twig-bundle": "^6.4 || ^7.0"
             },
             "conflict": {
@@ -2027,31 +2026,28 @@
                 "two-step"
             ],
             "support": {
-                "source": "https://github.com/scheb/2fa-bundle/tree/v7.13.1"
+                "source": "https://github.com/scheb/2fa-bundle/tree/v7.0.0"
             },
-            "time": "2025-12-18T15:29:07+00:00"
+            "time": "2023-12-03T16:24:13+00:00"
         },
         {
             "name": "scheb/2fa-google-authenticator",
-            "version": "v7.13.1",
+            "version": "v7.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/scheb/2fa-google-authenticator.git",
-                "reference": "7ad34bbde343a0770571464127ee072aacb70a58"
+                "reference": "34cf210e293dec5c20fd61a7b7c199c2cac471af"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/scheb/2fa-google-authenticator/zipball/7ad34bbde343a0770571464127ee072aacb70a58",
-                "reference": "7ad34bbde343a0770571464127ee072aacb70a58",
+                "url": "https://api.github.com/repos/scheb/2fa-google-authenticator/zipball/34cf210e293dec5c20fd61a7b7c199c2cac471af",
+                "reference": "34cf210e293dec5c20fd61a7b7c199c2cac471af",
                 "shasum": ""
             },
             "require": {
-                "php": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
+                "php": "~8.2.0 || ~8.3.0",
                 "scheb/2fa-bundle": "self.version",
                 "spomky-labs/otphp": "^11.0"
-            },
-            "suggest": {
-                "symfony/validator": "Needed if you want to use the Google Authenticator TOTP validator constraint"
             },
             "type": "library",
             "autoload": {
@@ -2080,9 +2076,9 @@
                 "two-step"
             ],
             "support": {
-                "source": "https://github.com/scheb/2fa-google-authenticator/tree/v7.13.1"
+                "source": "https://github.com/scheb/2fa-google-authenticator/tree/v7.0.0"
             },
-            "time": "2025-12-04T15:55:14+00:00"
+            "time": "2023-12-03T16:24:13+00:00"
         },
         {
             "name": "spomky-labs/otphp",

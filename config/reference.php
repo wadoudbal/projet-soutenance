@@ -1172,8 +1172,6 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *             enable_csrf?: scalar|Param|null, // Default: false
  *             csrf_parameter?: scalar|Param|null, // Default: "_csrf_token"
  *             csrf_token_id?: scalar|Param|null, // Default: "two_factor"
- *             csrf_header?: scalar|Param|null, // Default: null
- *             csrf_token_manager?: scalar|Param|null, // Default: "scheb_two_factor.csrf_token_manager"
  *             provider?: scalar|Param|null, // Default: null
  *         },
  *         x509?: array{
@@ -1543,11 +1541,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     ip_whitelist?: list<scalar|Param|null>,
  *     ip_whitelist_provider?: scalar|Param|null, // Default: "scheb_two_factor.default_ip_whitelist_provider"
  *     two_factor_token_factory?: scalar|Param|null, // Default: "scheb_two_factor.default_token_factory"
- *     two_factor_provider_decider?: scalar|Param|null, // Default: "scheb_two_factor.default_provider_decider"
  *     two_factor_condition?: scalar|Param|null, // Default: null
- *     code_reuse_cache?: scalar|Param|null, // Default: null
- *     code_reuse_cache_duration?: int|Param, // Default: 60
- *     code_reuse_default_handler?: scalar|Param|null, // Default: null
  *     google?: bool|array{
  *         enabled?: scalar|Param|null, // Default: false
  *         form_renderer?: scalar|Param|null, // Default: null

@@ -1,4 +1,3 @@
-{# templates/bundles/SchebTwoFactorBundle/Authentication/form.html.twig #}
 {% extends 'base.html.twig' %}
 
 {% block title %}Vérification 2FA{% endblock %}
@@ -14,18 +13,16 @@
                 <div class="card-body">
                     <p>Entrez le code à 6 chiffres généré par votre application mobile.</p>
 
-                    <form action="{{ check_path }}" method="post">
-                        {# Le bundle gère ces variables automatiquement #}
-                        {% if authentication_error %}
-                            <div class="alert alert-danger">{{ authentication_error|trans(authentication_error_data, 'SchebTwoFactorBundle') }}</div>
-                        {% endif %}
-
+                    {# On utilise la route configurée pour le traitement #}
+                    <form action="{{ path('2fa_login_check') }}" method="post">
+                        
                         <div class="mb-3">
                             <input type="text" 
-                                   name="{{ auth_code_parameter }}" 
+                                   name="_auth_code" 
                                    class="form-control form-control-lg text-center font-monospace" 
                                    placeholder="000000" 
                                    autofocus 
+                                   required
                                    autocomplete="one-time-code">
                         </div>
 

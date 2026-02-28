@@ -6,7 +6,6 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-// 1. Décommenté : Import nécessaire pour que Symfony reconnaisse le type 2FA
 use Scheb\TwoFactorBundle\Model\Google\TwoFactorInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -14,8 +13,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
-#[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
-// 2. Décommenté : On implémente officiellement l'interface
+#[UniqueEntity(fields: ['email'], message: 'Il existe déjà un compte avec cet email')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFactorInterface
 {
     #[ORM\Id]
@@ -29,6 +27,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     #[ORM\Column]
     private array $roles = [];
 
+    /**
+     * @var string|null Le mot de passe hashé
+     */
     #[ORM\Column]
     private ?string $password = null;
 
@@ -72,8 +73,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function isGoogleAuthenticatorEnabled(): bool
     {
-        // La 2FA est active uniquement si l'utilisateur possède un secret généré
-        return null !== $this->googleAuthenticatorSecret;
+        // On vérifie que le secret n'est ni null, ni une chaîne vide
+        return !empty($this->googleAuthenticatorSecret);
     }
 
     public function getGoogleAuthenticatorUsername(): string
@@ -117,6 +118,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     public function getRoles(): array
     {
         $roles = $this->roles;
+        // garantit que chaque utilisateur possède au moins ROLE_USER
         $roles[] = 'ROLE_USER';
         return array_unique($roles);
     }
@@ -127,6 +129,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         return $this;
     }
 
+    /**
+     * @see PasswordAuthenticatedUserInterface
+     */
     public function getPassword(): ?string
     {
         return $this->password;
@@ -138,16 +143,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         return $this;
     }
 
-    public function __serialize(): array
-    {
-        $data = (array) $this;
-        $data["\0".self::class."\0password"] = $this->password ? hash('crc32c', $this->password) : null;
-        return $data;
-    }
-
     public function eraseCredentials(): void
     {
+        // Si vous stockez des données sensibles temporaires en clair, nettoyez-les ici
     }
+
+    // --- AUTRES GETTERS / SETTERS ---
 
     public function getWorkouts(): Collection
     {
@@ -253,19 +254,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
             $this->goals->add($goal);
             $goal->setUser($this);
         }
-
         return $this;
     }
 
     public function removeGoal(Goal $goal): static
     {
         if ($this->goals->removeElement($goal)) {
-            // set the owning side to null (unless already changed)
             if ($goal->getUser() === $this) {
                 $goal->setUser(null);
             }
         }
-
         return $this;
     }
 }

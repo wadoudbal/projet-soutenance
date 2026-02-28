@@ -16,28 +16,61 @@ class WorkoutRepository extends ServiceEntityRepository
         parent::__construct($registry, Workout::class);
     }
 
-    //    /**
-    //     * @return Workout[] Returns an array of Workout objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('w')
-    //            ->andWhere('w.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('w.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    /**
+     * Calcule le volume total (Poids * Reps * Séries) directement en base de données.
+     */
+    public function getTotalVolumeByUser($user): float
+    {
+        return (float) $this->createQueryBuilder('w')
+            ->select('SUM(w.weight * w.reps * w.serie)')
+            ->where('w.user = :user')
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 
-    //    public function findOneBySomeField($value): ?Workout
-    //    {
-    //        return $this->createQueryBuilder('w')
-    //            ->andWhere('w.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    /**
+     * Récupère la valeur maximale de la colonne weight pour cet utilisateur.
+     */
+    public function getAbsoluteRecordByUser($user): float
+    {
+        return (float) $this->createQueryBuilder('w')
+            ->select('MAX(w.weight)')
+            ->where('w.user = :user')
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * Compte le nombre de jours d'entraînement différents sur la semaine en cours.
+     */
+    public function countSessionsThisWeek($user): int
+    {
+        $startOfWeek = new \DateTime('monday this week 00:00:00');
+        
+        return (int) $this->createQueryBuilder('w')
+            ->select('COUNT(DISTINCT SUBSTRING(w.createdAt, 1, 10))') 
+            ->where('w.user = :user')
+            ->andWhere('w.createdAt >= :start')
+            ->setParameter('user', $user)
+            ->setParameter('start', $startOfWeek)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * Récupère le record (poids max) pour un exercice spécifique.
+     */
+    public function getRecordForExercise($user, $exercise): float
+    {
+        return (float) $this->createQueryBuilder('w')
+            ->select('MAX(w.weight)')
+            ->where('w.user = :user')
+            ->andWhere('w.exercise = :ex')
+            ->setParameter('user', $user)
+            ->setParameter('ex', $exercise)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }

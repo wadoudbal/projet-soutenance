@@ -1,39 +1,165 @@
 {% extends 'base.html.twig' %}
 
+{% block title %}Performance ID - Fixer un Objectif{% endblock %}
+
 {% block body %}
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-5">
-            <div class="p-4 p-md-5" style="background: rgba(0,0,0,0.7); border: 1px solid rgba(220, 53, 69, 0.4); backdrop-filter: blur(15px);">
-                
-                <div class="text-center mb-4">
-                    <h1 class="text-white m-0" style="font-size: 2.5rem;">FIXER UN <span class="text-danger">OBJECTIF</span></h1>
-                    <p class="text-white-50 small text-uppercase">Définit ton prochain palier de force</p>
+<style>
+    :root {
+        --sidebar-width: 280px;
+        --primary-red: #ff3131;
+    }
+
+    .bebas { font-family: 'Bebas Neue', cursive; letter-spacing: 1px; }
+
+    /* Structure Globale */
+    .dashboard-container {
+        display: flex;
+        min-height: 100vh;
+    }
+
+    /* --- SIDEBAR (Standardisée) --- */
+    .sidebar {
+        width: var(--sidebar-width);
+        background: rgba(10, 10, 10, 0.95);
+        backdrop-filter: blur(15px);
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        flex-direction: column;
+        padding: 2rem 1.5rem;
+        position: fixed;
+        height: 100vh;
+        z-index: 100;
+    }
+
+    .sidebar-brand {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 2rem;
+        color: #fff;
+        text-decoration: none;
+        margin-bottom: 3rem;
+        text-align: center;
+    }
+
+    .nav-link-custom {
+        display: flex;
+        align-items: center;
+        color: #aaa;
+        text-decoration: none;
+        padding: 1rem;
+        margin-bottom: 0.5rem;
+        border-radius: 8px;
+        transition: 0.3s;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+    }
+
+    .nav-link-custom i { font-size: 1.2rem; margin-right: 15px; }
+
+    .nav-link-custom:hover, .nav-link-custom.active {
+        background: rgba(255, 49, 49, 0.1);
+        color: var(--primary-red);
+    }
+
+    /* --- CONTENU PRINCIPAL --- */
+    .main-content {
+        flex: 1;
+        margin-left: var(--sidebar-width);
+        padding: 3rem;
+        width: calc(100% - var(--sidebar-width));
+        display: flex;
+        align-items: center; /* Centre le formulaire verticalement */
+        justify-content: center; /* Centre le formulaire horizontalement */
+    }
+
+    .glass-form-card {
+        background: rgba(0,0,0,0.7); 
+        border: 1px solid rgba(255, 49, 49, 0.3); 
+        backdrop-filter: blur(15px);
+        padding: 3rem;
+        width: 100%;
+        max-width: 500px;
+    }
+
+    .form-control, .form-select {
+        transition: 0.3s;
+    }
+
+    .form-control:focus, .form-select:focus {
+        background-color: rgba(255, 255, 255, 0.1) !important;
+        border-color: var(--primary-red) !important;
+        box-shadow: 0 0 15px rgba(255, 49, 49, 0.2);
+    }
+
+    @media (max-width: 992px) {
+        .sidebar { width: 80px; padding: 2rem 0.5rem; }
+        .sidebar-brand span, .nav-link-custom span { display: none; }
+        .main-content { margin-left: 80px; width: calc(100% - 80px); padding: 1.5rem; }
+        .nav-link-custom { justify-content: center; }
+        .nav-link-custom i { margin: 0; }
+    }
+</style>
+
+<div class="dashboard-container">
+    {# --- SIDEBAR --- #}
+    <nav class="sidebar">
+        <a href="{{ path('app_dashboard') }}" class="sidebar-brand">
+            PERFORMANCE <span style="color: var(--primary-red)">ID</span>
+        </a>
+
+        <div class="nav-menu">
+            <a href="{{ path('app_dashboard') }}" class="nav-link-custom">
+                <i class="bi bi-speedometer2"></i> <span>Dashboard</span>
+            </a>
+            <a href="{{ path('app_workout_index') }}" class="nav-link-custom">
+                <i class="bi bi-calendar-check"></i> <span>Historique</span>
+            </a>
+            <a href="{{ path('app_goal_new') }}" class="nav-link-custom active">
+                <i class="bi bi-trophy"></i> <span>Objectifs</span>
+            </a>
+            <a href="#" class="nav-link-custom">
+                <i class="bi bi-person-circle"></i> <span>Mon Profil</span>
+            </a>
+        </div>
+
+        <div class="mt-auto">
+            <hr style="border-color: rgba(255,255,255,0.1)">
+            <a href="{{ path('app_logout') }}" class="nav-link-custom text-danger">
+                <i class="bi bi-box-arrow-left"></i> <span>Déconnexion</span>
+            </a>
+        </div>
+    </nav>
+
+    {# --- FORMULAIRE D'OBJECTIF --- #}
+    <main class="main-content">
+        <div class="glass-form-card shadow-lg">
+            <div class="text-center mb-5">
+                <h1 class="text-white bebas m-0" style="font-size: 2.5rem;">FIXER UN <span class="text-danger">OBJECTIF</span></h1>
+                <p class="text-white-50 small text-uppercase" style="letter-spacing: 1px;">Définit ton prochain palier de force</p>
+            </div>
+
+            {{ form_start(form) }}
+                <div class="mb-4">
+                    <label class="text-white-50 small text-uppercase fw-bold mb-2">Choisir l'exercice</label>
+                    {{ form_widget(form.exercise, {'attr': {'class': 'form-select bg-dark text-white border-secondary rounded-0 py-3'}}) }}
                 </div>
 
-                {{ form_start(form) }}
-                    <div class="mb-4">
-                        <label class="text-white-50 small text-uppercase fw-bold mb-2">Exercice</label>
-                        {{ form_widget(form.exercise, {'attr': {'class': 'form-select bg-dark text-white border-secondary rounded-0 py-3'}}) }}
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="text-white-50 small text-uppercase fw-bold mb-2">Poids cible (KG)</label>
-                        {{ form_widget(form.targetWeight, {'attr': {'class': 'form-control bg-dark text-white border-secondary rounded-0 py-3', 'placeholder': 'Ex: 100'}}) }}
-                    </div>
-
-                    <button type="submit" class="btn btn-danger w-100 py-3 fw-bold rounded-0">
-                        <i class="bi bi-fire me-2"></i>ACTIVER L'OBJECTIF
-                    </button>
-                {{ form_end(form) }}
-
-                <div class="text-center mt-4">
-                    <a href="{{ path('app_dashboard') }}" class="text-white-50 small text-decoration-none">
-                        <i class="bi bi-arrow-left"></i> Annuler
-                    </a>
+                <div class="mb-4">
+                    <label class="text-white-50 small text-uppercase fw-bold mb-2">Poids cible (KG)</label>
+                    {{ form_widget(form.targetWeight, {'attr': {'class': 'form-control bg-dark text-white border-secondary rounded-0 py-3', 'placeholder': 'Ex: 100'}}) }}
                 </div>
+
+                <button type="submit" class="btn btn-danger w-100 py-3 fw-bold rounded-0 bebas fs-4 shadow-lg">
+                    <i class="bi bi-fire me-2"></i>ACTIVER L'OBJECTIF
+                </button>
+            {{ form_end(form) }}
+
+            <div class="text-center mt-4">
+                <a href="{{ path('app_dashboard') }}" class="text-white-50 small text-decoration-none">
+                    <i class="bi bi-arrow-left"></i> Retour au tableau de bord
+                </a>
             </div>
         </div>
-    </div>
+    </main>
 </div>
 {% endblock %}

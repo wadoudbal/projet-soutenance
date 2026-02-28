@@ -1,0 +1,31 @@
+{# templates/admin/logs.html.twig #}
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block content_title %}Historique d'activité (MongoDB){% endblock %}
+
+{% block main %}
+    <div class="content-panel">
+        <table class="table datagrid">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Utilisateur</th>
+                    <th>Action effectuée</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                    <tr>
+                        <td>{{ log.createdAt|date('d/m/Y H:i:s') }}</td>
+                        <td><span class="badge badge-secondary">{{ log.userEmail }}</span></td>
+                        <td><strong>{{ log.action }}</strong></td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="3" class="text-center">Aucun log enregistré pour le moment.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

@@ -4,93 +4,236 @@
 
 {% block body %}
 <style>
+    :root {
+        --sidebar-width: 280px;
+        --primary-red: #ff3131;
+        --success-green: #198754;
+        --warning-orange: #ffc107;
+    }
+
     .bebas { font-family: 'Bebas Neue', cursive; letter-spacing: 1px; }
-    .card-dark { background: rgba(15, 15, 15, 0.95); border: 1px solid rgba(255,255,255,0.1); border-top: 4px solid #dc3545; color: white; }
-    .stat-box { background: rgba(255, 255, 255, 0.05); padding: 15px; border-left: 3px solid #dc3545; }
-    .imc-badge { font-family: 'Bebas Neue'; font-size: 1.5rem; padding: 5px 15px; }
+
+    /* Structure Globale */
+    .dashboard-container {
+        display: flex;
+        min-height: 100vh;
+    }
+
+    /* --- SIDEBAR --- */
+    .sidebar {
+        width: var(--sidebar-width);
+        background: rgba(10, 10, 10, 0.95);
+        backdrop-filter: blur(15px);
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        flex-direction: column;
+        padding: 2rem 1.5rem;
+        position: fixed;
+        height: 100vh;
+        z-index: 100;
+    }
+
+    .sidebar-brand {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 2rem;
+        color: #fff;
+        text-decoration: none;
+        margin-bottom: 3rem;
+        text-align: center;
+    }
+
+    .nav-link-custom {
+        display: flex;
+        align-items: center;
+        color: #aaa;
+        text-decoration: none;
+        padding: 1rem;
+        margin-bottom: 0.5rem;
+        border-radius: 8px;
+        transition: 0.3s;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+    }
+
+    .nav-link-custom i { font-size: 1.2rem; margin-right: 15px; }
+
+    .nav-link-custom:hover, .nav-link-custom.active {
+        background: rgba(255, 49, 49, 0.1);
+        color: var(--primary-red);
+    }
+
+    /* --- CONTENU PRINCIPAL --- */
+    .main-content {
+        flex: 1;
+        margin-left: var(--sidebar-width);
+        padding: 3rem;
+        width: calc(100% - var(--sidebar-width));
+    }
+
+    /* Styles Cartes et Profil */
+    .card-dark { 
+        background: rgba(0, 0, 0, 0.7); 
+        border: 1px solid rgba(255,255,255,0.1); 
+        border-top: 4px solid var(--primary-red); 
+        color: white; 
+        backdrop-filter: blur(15px);
+    }
+    
+    .stat-box { 
+        background: rgba(255, 255, 255, 0.05); 
+        padding: 15px; 
+        border-left: 3px solid var(--primary-red); 
+    }
+
+    /* Styles IMC (Nettoyés pour éviter les erreurs VS Code) */
+    .imc-badge { 
+        font-family: 'Bebas Neue'; 
+        font-size: 1.8rem; 
+        padding: 5px 20px; 
+    }
+    .imc-success { background-color: var(--success-green); color: #fff; }
+    .imc-warning { background-color: var(--warning-orange); color: #000; }
+    
+    .status-success { color: var(--success-green); }
+    .status-warning { color: var(--warning-orange); }
+
+    @media (max-width: 992px) {
+        .sidebar { width: 80px; padding: 2rem 0.5rem; }
+        .sidebar-brand span, .nav-link-custom span { display: none; }
+        .main-content { margin-left: 80px; width: calc(100% - 80px); padding: 1.5rem; }
+        .nav-link-custom { justify-content: center; }
+        .nav-link-custom i { margin: 0; }
+    }
 </style>
 
-<div class="container py-5">
-    <div class="row g-4">
-        {# COLONNE GAUCHE : INFOS & SANTÉ #}
-        <div class="col-md-7">
-            <div class="card card-dark p-4 shadow-lg">
-                <h2 class="bebas mb-4"><i class="bi bi-heart-pulse text-danger me-2"></i>Ma Condition <span class="text-danger">Physique</span></h2>
-                
-                {{ form_start(form) }}
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="bebas text-white-50">Prénom / Pseudo</label>
-                        {{ form_widget(form.pseudo, {'attr': {'class': 'form-control bg-dark text-white border-secondary'}}) }}
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <label class="bebas text-white-50">Poids (kg)</label>
-                        {{ form_widget(form.poids, {'attr': {'class': 'form-control bg-dark text-white border-secondary'}}) }}
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <label class="bebas text-white-50">Taille (cm)</label>
-                        {{ form_widget(form.taille, {'attr': {'class': 'form-control bg-dark text-white border-secondary'}}) }}
-                    </div>
-                </div>
-                <button type="submit" class="btn btn-danger bebas w-100 mt-2">Mettre à jour mes données</button>
-                {{ form_end(form) }}
+<div class="dashboard-container">
+    {# --- SIDEBAR --- #}
+    <nav class="sidebar">
+        <a href="{{ path('app_dashboard') }}" class="sidebar-brand">
+            PERFORMANCE <span style="color: var(--primary-red)">ID</span>
+        </a>
 
-                {# CALCUL IMC EN TEMPS RÉEL #}
-                {% if app.user.poids and app.user.taille %}
-                    {% set imc = app.user.poids / ((app.user.taille / 100) * (app.user.taille / 100)) %}
-                    <div class="mt-5 p-4 border border-secondary border-opacity-25 bg-black bg-opacity-25">
-                        <h4 class="bebas">Ton Indice de Masse Corporelle (IMC)</h4>
-                        <div class="d-flex align-items-center justify-content-between">
-                            <span class="imc-badge {% if imc < 18.5 or imc > 25 %}bg-warning text-dark{% else %}bg-success text-white{% endif %}">
-                                {{ imc|number_format(1) }}
-                            </span>
-                            <p class="mb-0 ms-3 small text-white-50">
-                                {% if imc < 18.5 %}Poids insuffisant{% elseif imc < 25 %}Poids normal (Optimal){% elseif imc < 30 %}Surpoids{% else %}Obésité{% endif %}
-                            </p>
-                        </div>
-                    </div>
-                {% endif %}
-            </div>
+        <div class="nav-menu">
+            <a href="{{ path('app_dashboard') }}" class="nav-link-custom">
+                <i class="bi bi-speedometer2"></i> <span>Dashboard</span>
+            </a>
+            <a href="{{ path('app_workout_index') }}" class="nav-link-custom">
+                <i class="bi bi-calendar-check"></i> <span>Historique</span>
+            </a>
+            <a href="{{ path('app_goal_new') }}" class="nav-link-custom">
+                <i class="bi bi-trophy"></i> <span>Objectifs</span>
+            </a>
+            <a href="{{ path('app_profile') }}" class="nav-link-custom active">
+                <i class="bi bi-person-circle"></i> <span>Mon Profil</span>
+            </a>
         </div>
 
-        {# COLONNE DROITE : SÉCURITÉ 2FA #}
-        <div class="col-md-5">
-            <div class="card card-dark p-4 shadow-lg mb-4" style="border-top-color: #ffc107;">
-                <h2 class="bebas mb-4"><i class="bi bi-shield-lock text-warning me-2"></i>Sécurité <span class="text-warning">2FA</span></h2>
-                <p class="small text-white-50">Protège tes données de performance en activant l'authentification à deux facteurs.</p>
-                
-                {# CHANGEMENT DYNAMIQUE ICI #}
-                {% if app.user.googleAuthenticatorSecret %}
-                    <div class="stat-box d-flex align-items-center justify-content-between" style="border-left-color: #198754;">
-                        <div>
-                            <div class="fw-bold text-uppercase">Statut : 
-                                <span class="text-success">ACTIVÉ</span>
+        <div class="mt-auto">
+            <hr style="border-color: rgba(255,255,255,0.1)">
+            <a href="{{ path('app_logout') }}" class="nav-link-custom text-danger">
+                <i class="bi bi-box-arrow-left"></i> <span>Déconnexion</span>
+            </a>
+        </div>
+    </nav>
+
+    {# --- CONTENU PROFIL --- #}
+    <main class="main-content">
+        <div class="mb-5">
+            <h4 class="text-danger mb-0 bebas" style="letter-spacing: 3px;">PARAMÈTRES DU COMPTE</h4>
+            <h1 class="bebas display-3 m-0 text-white">PROFIL <span class="text-danger">SANTÉ</span></h1>
+        </div>
+
+        <div class="row g-4">
+            {# COLONNE GAUCHE : INFOS & SANTÉ #}
+            <div class="col-md-7">
+                <div class="card card-dark p-4 shadow-lg">
+                    <h2 class="bebas mb-4"><i class="bi bi-heart-pulse text-danger me-2"></i>Ma Condition <span class="text-danger">Physique</span></h2>
+                    
+                    {{ form_start(form) }}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="bebas text-white-50">Prénom / Pseudo</label>
+                            {{ form_widget(form.pseudo, {'attr': {'class': 'form-control bg-dark text-white border-secondary rounded-0'}}) }}
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="bebas text-white-50">Poids (kg)</label>
+                            {{ form_widget(form.poids, {'attr': {'class': 'form-control bg-dark text-white border-secondary rounded-0'}}) }}
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="bebas text-white-50">Taille (cm)</label>
+                            {{ form_widget(form.taille, {'attr': {'class': 'form-control bg-dark text-white border-secondary rounded-0'}}) }}
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-danger bebas w-100 mt-2 py-2 fs-5">Mettre à jour mes données</button>
+                    {{ form_end(form) }}
+
+                    {# CALCUL IMC AVEC LOGIQUE TWIG HORS CSS #}
+                    {% if app.user.poids and app.user.taille %}
+                        {% set imc = app.user.poids / ((app.user.taille / 100) * (app.user.taille / 100)) %}
+                        {% set is_healthy = imc >= 18.5 and imc <= 25 %}
+                        
+                        <div class="mt-5 p-4 border border-secondary border-opacity-25 bg-black bg-opacity-25">
+                            <h4 class="bebas mb-3">Ton Indice de Masse Corporelle (IMC)</h4>
+                            <div class="d-flex align-items-center justify-content-between">
+                                <span class="imc-badge rounded-0 {{ is_healthy ? 'imc-success' : 'imc-warning' }}">
+                                    {{ imc|number_format(1) }}
+                                </span>
+                                <div class="ms-4 text-end">
+                                    <p class="mb-0 fw-bold text-uppercase {{ is_healthy ? 'status-success' : 'status-warning' }}">
+                                        {% if imc < 18.5 %}Poids insuffisant
+                                        {% elseif imc <= 25 %}Poids idéal
+                                        {% elseif imc < 30 %}Surpoids
+                                        {% else %}Obésité{% endif %}
+                                    </p>
+                                    <small class="text-white-50">Basé sur tes dernières mesures</small>
+                                </div>
                             </div>
                         </div>
-                        <a href="{{ path('app_2fa_disable') }}" class="btn btn-outline-danger btn-sm" onclick="return confirm('Désactiver la sécurité ?')">
-                            Désactiver
-                        </a>
-                    </div>
-                {% else %}
-                    <div class="stat-box d-flex align-items-center justify-content-between" style="border-left-color: #dc3545;">
-                        <div>
-                            <div class="fw-bold text-uppercase">Statut : 
-                                <span class="text-danger">DÉSACTIVÉ</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            {# COLONNE DROITE : SÉCURITÉ 2FA #}
+            <div class="col-md-5">
+                <div class="card card-dark p-4 shadow-lg mb-4" style="border-top-color: var(--warning-orange);">
+                    <h2 class="bebas mb-4"><i class="bi bi-shield-lock text-warning me-2"></i>Sécurité <span class="text-warning">2FA</span></h2>
+                    <p class="small text-white-50">Authentification à deux facteurs via Google Authenticator.</p>
+                    
+                    {% if app.user.googleAuthenticatorSecret %}
+                        <div class="stat-box d-flex align-items-center justify-content-between" style="border-left-color: var(--success-green);">
+                            <div>
+                                <div class="fw-bold text-uppercase small text-white-50">Statut</div>
+                                <div class="text-success fw-bold bebas fs-4">ACTIVÉ</div>
                             </div>
+                            <a href="{{ path('app_2fa_disable') }}" class="btn btn-outline-danger btn-sm" onclick="return confirm('Désactiver la sécurité ?')">
+                                Désactiver
+                            </a>
                         </div>
-                        <a href="{{ path('app_2fa_enable') }}" class="btn btn-warning btn-sm text-dark fw-bold">
-                            Activer maintenant
-                        </a>
+                    {% else %}
+                        <div class="stat-box d-flex align-items-center justify-content-between" style="border-left-color: var(--primary-red);">
+                            <div>
+                                <div class="fw-bold text-uppercase small text-white-50">Statut</div>
+                                <div class="text-danger fw-bold bebas fs-4">DÉSACTIVÉ</div>
+                            </div>
+                            <a href="{{ path('app_2fa_enable') }}" class="btn btn-warning btn-sm text-dark fw-bold">
+                                ACTIVER
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="card card-dark p-4 shadow-lg border-top-0">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-envelope-at fs-3 me-3 text-white-50"></i>
+                        <div>
+                            <div class="text-white-50 small text-uppercase fw-bold">Email enregistré</div>
+                            <div class="text-white fw-bold">{{ app.user.userIdentifier }}</div>
+                        </div>
                     </div>
-                {% endif %}
-                
-                <div class="mt-4 pt-3 border-top border-secondary border-opacity-25 text-center">
-                    <a href="{{ path('app_logout') }}" class="btn btn-link text-white-50 text-decoration-none small">
-                        <i class="bi bi-box-arrow-right"></i> Déconnexion sécurisée
-                    </a>
                 </div>
             </div>
         </div>
-    </div>
+    </main>
 </div>
 {% endblock %}

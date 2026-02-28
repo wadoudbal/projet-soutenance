@@ -1,0 +1,136 @@
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block content_title %}Tableau de Bord{% endblock %}
+
+{% block main %}
+    <style>
+        .stat-card { transition: transform 0.2s; border: none; border-radius: 10px; }
+        .stat-card:hover { transform: translateY(-5px); }
+        .icon-shape { width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(255,255,255,0.2); }
+        .table-vcenter td { vertical-align: middle; }
+        .chart-container { position: relative; height: 300px; width: 100%; }
+    </style>
+
+    <div class="row">
+        {# Carte Utilisateurs #}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card stat-card bg-primary text-white shadow">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase mb-1" style="font-size: 0.8rem; opacity: 0.8;">Utilisateurs</h6>
+                            <h2 class="mb-0 font-weight-bold">{{ countUsers }}</h2>
+                        </div>
+                        <div class="icon-shape"><i class="fas fa-users fa-lg"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# Carte Exercices #}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card stat-card bg-success text-white shadow">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase mb-1" style="font-size: 0.8rem; opacity: 0.8;">Exercices</h6>
+                            <h2 class="mb-0 font-weight-bold">{{ countExercises }}</h2>
+                        </div>
+                        <div class="icon-shape"><i class="fas fa-dumbbell fa-lg"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# GRAPHIQUE D'ACTIVITÉ #}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h5 class="font-weight-bold mb-3"><i class="fas fa-chart-line text-muted mr-2"></i> Évolution de l'activité (7 jours)</h5>
+                    <div class="chart-container">
+                        <canvas id="activityChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# STOCKAGE DES DONNÉES (Pour éviter les erreurs JS dans l'éditeur) #}
+    <div id="chart-data" 
+         data-labels="{{ chartLabels|e('html_attr') }}" 
+         data-values="{{ chartData|e('html_attr') }}">
+    </div>
+
+    {# SECTION ACTIVITÉ RÉCENTE (MONGO DB) #}
+    <div class="row mt-2">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 font-weight-bold"><i class="fas fa-history text-muted mr-2"></i> Activité récente (Flux MongoDB)</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0 table-vcenter">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="border-0">Utilisateur</th>
+                                    <th class="border-0">Action effectuée</th>
+                                    <th class="border-0">Date et Heure</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for log in recentLogs %}
+                                    <tr>
+                                        <td>
+                                            <span class="badge badge-light border text-dark p-2">
+                                                <i class="far fa-user mr-1 text-primary"></i> {{ log.userEmail }}
+                                            </span>
+                                        </td>
+                                        <td><span class="font-weight-bold">{{ log.action }}</span></td>
+                                        <td class="text-muted small">{{ log.createdAt|date('d/m/Y H:i') }}</td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="3" class="text-center py-5 text-muted">Aucun log trouvé.</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const dataContainer = document.getElementById('chart-data');
+            const labels = JSON.parse(dataContainer.dataset.labels);
+            const values = JSON.parse(dataContainer.dataset.values);
+
+            const ctx = document.getElementById('activityChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Actions',
+                        data: values,
+                        borderColor: '#4e73df',
+                        backgroundColor: 'rgba(78, 115, 223, 0.05)',
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        });
+    </script>
+{% endblock %}

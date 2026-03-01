@@ -72,10 +72,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     // --- MÉTHODES OBLIGATOIRES POUR LA 2FA (Google Authenticator) ---
 
     public function isGoogleAuthenticatorEnabled(): bool
-    {
-        // On vérifie que le secret n'est ni null, ni une chaîne vide
-        return !empty($this->googleAuthenticatorSecret);
-    }
+{
+    // Important : vérifier que ce n'est ni null, ni une chaîne vide
+    return !empty($this->googleAuthenticatorSecret);
+}
 
     public function getGoogleAuthenticatorUsername(): string
     {

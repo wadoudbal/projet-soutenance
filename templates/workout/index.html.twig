@@ -11,13 +11,12 @@
 
     .bebas { font-family: 'Bebas Neue', cursive; letter-spacing: 1px; }
 
-    /* Structure Globale */
     .dashboard-container {
         display: flex;
         min-height: 100vh;
     }
 
-    /* --- SIDEBAR (Copie conforme Dashboard) --- */
+    /* --- SIDEBAR STYLE --- */
     .sidebar {
         width: var(--sidebar-width);
         background: rgba(10, 10, 10, 0.95);
@@ -69,7 +68,6 @@
         width: calc(100% - var(--sidebar-width));
     }
 
-    /* Styles spécifiques Historique */
     .glass-search {
         background: rgba(0, 0, 0, 0.8);
         backdrop-filter: blur(15px);
@@ -138,36 +136,9 @@
 </style>
 
 <div class="dashboard-container">
-    {# --- SIDEBAR --- #}
-    <nav class="sidebar">
-        <a href="{{ path('app_home') }}" class="sidebar-brand">
-            PERFORMANCE <span style="color: var(--primary-red)">ID</span>
-        </a>
+    {# Utilisation de l'include pour la sidebar corrigée #}
+    {{ include('_sidebar.html.twig') }}
 
-        <div class="nav-menu">
-            <a href="{{ path('app_home') }}" class="nav-link-custom">
-                <i class="bi bi-speedometer2"></i> <span>Dashboard</span>
-            </a>
-            <a href="{{ path('app_workout_index') }}" class="nav-link-custom active">
-                <i class="bi bi-calendar-check"></i> <span>Historique</span>
-            </a>
-            <a href="{{ path('app_goal_new') }}" class="nav-link-custom">
-                <i class="bi bi-trophy"></i> <span>Objectifs</span>
-            </a>
-            <a href="#" class="nav-link-custom">
-                <i class="bi bi-person-circle"></i> <span>Mon Profil</span>
-            </a>
-        </div>
-
-        <div class="mt-auto">
-            <hr style="border-color: rgba(255,255,255,0.1)">
-            <a href="{{ path('app_logout') }}" class="nav-link-custom text-danger">
-                <i class="bi bi-box-arrow-left"></i> <span>Déconnexion</span>
-            </a>
-        </div>
-    </nav>
-
-    {# --- CONTENU DE L'HISTORIQUE --- #}
     <main class="main-content">
         <div class="mb-5">
             <h4 class="text-danger mb-0 bebas" style="letter-spacing: 3px;">HISTORIQUE D'ENTRAÎNEMENT</h4>
@@ -179,7 +150,7 @@
             <form method="get" class="row g-2">
                 <div class="col-md-10">
                     <input type="text" name="q" class="form-control bg-dark text-white border-secondary py-2" 
-                           placeholder="Rechercher un exercice..." value="{{ searchTerm }}">
+                           placeholder="Rechercher un exercice..." value="{{ searchTerm|default('') }}">
                 </div>
                 <div class="col-md-2">
                     <button type="submit" class="btn btn-danger w-100 bebas fs-5">FILTRER</button>
@@ -203,7 +174,7 @@
             <div class="card workout-row shadow-lg">
                 <div class="card-body py-3">
                     <div class="row align-items-center">
-                        <div class="col-md-1 border-end border-secondary">
+                        <div class="col-md-1 border-end border-secondary text-center">
                             <span class="text-white fw-bold">{{ workout.createdAt|date('H:i') }}</span>
                         </div>
 

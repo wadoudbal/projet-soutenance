@@ -2,9 +2,11 @@
 
 namespace App\Security;
 
+use App\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Http\Authenticator\AbstractLoginFormAuthenticator;
@@ -22,28 +24,43 @@ class AppAuthenticator extends AbstractLoginFormAuthenticator
 
     public const LOGIN_ROUTE = 'app_login';
 
-    public function __construct(private UrlGeneratorInterface $urlGenerator)
-    {
+    public function __construct(
+        private UrlGeneratorInterface $urlGenerator,
+        private UserRepository $userRepository,
+        private UserPasswordHasherInterface $passwordHasher
+    ) {
     }
 
-    public function authenticate(Request $request): Passport
-    {
-        $email = $request->request->get('email', '');
-        $password = $request->request->get('password', '');
-        $csrfToken = $request->request->get('_csrf_token', '');
+ public function authenticate(Request $request): Passport
+{
+    $email = $request->request->get('email', '');
+    $password = $request->request->get('password', '');
+    $csrfToken = $request->request->get('_csrf_token', '');
+
+    $user = $this->userRepository->findOneBy(['email' => $email]);
+
+    if ($request->isMethod('POST') && $user) {
+        // ON GÉNÈRE UN HASH "TEST" ICI AVEC LE HASHER DE L'AUTHENTICATOR
+        $testHash = $this->passwordHasher->hashPassword($user, $password);
+        
+        // dd([
+        //     'PASSWORD_SAISI' => $password,
+        //     'HASH_EN_BDD' => $user->getPassword(),
+        //     'HASH_GENERÉ_MAINTENANT' => $testHash,
+        //     'CORRESPONDANCE_DIRECTE' => password_verify($password, $user->getPassword()) ? 'OUI' : 'NON',
+        //     'INFO' => 'Si CORRESPONDANCE est NON mais que les deux hash commencent par $2y$, c\'est que le mot de passe n\'était pas le même à l\'inscription.'
+        // ]);
+    }
+
+    
+        // -----------------------------------------------------------
 
         $request->getSession()->set(SecurityRequestAttributes::LAST_USERNAME, $email);
-
-        // --- TEST DE DIAGNOSTIC ---
-        // DECOMMENTE LA LIGNE CI-DESSOUS (enlève les //) POUR VOIR SI LE FORMULAIRE ENVOIE BIEN LES INFOS
-        //  dd($email, $password, $csrfToken); 
-        // ---------------------------
 
         return new Passport(
             new UserBadge($email),
             new PasswordCredentials($password),
             [
-                // "authenticate" doit être identique au premier argument de csrf_token() dans ton Twig
                 new CsrfTokenBadge('authenticate', $csrfToken),
                 new RememberMeBadge(),
             ]
@@ -57,13 +74,10 @@ class AppAuthenticator extends AbstractLoginFormAuthenticator
         }
 
         $user = $token->getUser();
-
-        // Redirection si Admin
         if (in_array('ROLE_ADMIN', $user->getRoles())) {
             return new RedirectResponse($this->urlGenerator->generate('admin'));
         }
 
-        // Redirection par défaut vers le Dashboard
         return new RedirectResponse($this->urlGenerator->generate('app_dashboard'));
     }
 

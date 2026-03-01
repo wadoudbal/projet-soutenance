@@ -18,10 +18,10 @@ class AdminActivitySubscriber implements EventSubscriberInterface
 
     public static function getSubscribedEvents(): array
     {
+        // ON VIDE TOUT ICI POUR TESTER LA DÉSACTIVATION 2FA
         return [
-            // On utilise les événements spécifiques à EasyAdmin
-            AfterEntityPersistedEvent::class => 'onAfterPersist',
-            AfterEntityDeletedEvent::class => 'onAfterDelete',
+            // AfterEntityPersistedEvent::class => 'onAfterPersist',
+            // AfterEntityDeletedEvent::class => 'onAfterDelete',
         ];
     }
 

@@ -1,0 +1,27 @@
+<nav class="sidebar">
+    <a href="{{ path('app_dashboard') }}" class="sidebar-brand">
+        PERFORMANCE <span style="color: var(--primary-red)">ID</span>
+    </a>
+
+    <div class="nav-menu">
+        <a href="{{ path('app_dashboard') }}" class="nav-link-custom {{ app.request.get('_route') == 'app_dashboard' ? 'active' : '' }}">
+            <i class="bi bi-speedometer2"></i> <span>Dashboard</span>
+        </a>
+        <a href="{{ path('app_workout_index') }}" class="nav-link-custom {{ app.request.get('_route') == 'app_workout_index' ? 'active' : '' }}">
+            <i class="bi bi-calendar-check"></i> <span>Historique</span>
+        </a>
+        <a href="{{ path('app_goal_new') }}" class="nav-link-custom {{ app.request.get('_route') == 'app_goal_new' ? 'active' : '' }}">
+            <i class="bi bi-trophy"></i> <span>Objectifs</span>
+        </a>
+        <a href="{{ path('app_profile') }}" class="nav-link-custom {{ app.request.get('_route') == 'app_profile' ? 'active' : '' }}">
+            <i class="bi bi-person-circle"></i> <span>Mon Profil</span>
+        </a>
+    </div>
+
+    <div class="mt-auto">
+        <hr style="border-color: rgba(255,255,255,0.1)">
+        <a href="{{ path('app_logout') }}" class="nav-link-custom text-danger" onclick="return confirm('Se déconnecter ?')">
+            <i class="bi bi-box-arrow-left"></i> <span>Déconnexion</span>
+        </a>
+    </div>
+</nav>

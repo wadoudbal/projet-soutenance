@@ -1,6 +1,8 @@
 {% extends 'base.html.twig' %}
 
-{# On désactive la navbar globale si elle est dans base.html.twig pour utiliser notre Sidebar #}
+{# 1. SEO Spécifique à la page #}
+{% block title %}Tableau de Bord - PERFORMANCE ID{% endblock %}
+
 {% block navbar %}{% endblock %}
 
 {% block body %}
@@ -10,23 +12,23 @@
         --primary-red: #ff3131;
     }
 
-    /* Structure Flexbox pour aligner Sidebar et Contenu */
     .dashboard-container {
         display: flex;
         min-height: 100vh;
-        background: transparent; /* Pour voir l'image du base.html.twig */
+        background: transparent;
     }
 
-    /* SIDEBAR ALIGNÉE À GAUCHE */
+    /* SIDEBAR */
     .sidebar {
         width: var(--sidebar-width);
         background: rgba(10, 10, 10, 0.95);
         backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
         border-right: 1px solid rgba(255, 255, 255, 0.1);
         display: flex;
         flex-direction: column;
         padding: 2rem 1.5rem;
-        position: fixed; /* Reste fixe au scroll */
+        position: fixed;
         height: 100vh;
         z-index: 100;
     }
@@ -48,7 +50,7 @@
         padding: 1rem;
         margin-bottom: 0.5rem;
         border-radius: 8px;
-        transition: 0.3s;
+        transition: all 0.3s ease;
         font-weight: 600;
         text-transform: uppercase;
         font-size: 0.9rem;
@@ -59,24 +61,32 @@
     .nav-link-custom:hover, .nav-link-custom.active {
         background: rgba(255, 49, 49, 0.1);
         color: var(--primary-red);
+        transform: translateX(5px);
     }
 
-    /* ZONE DE CONTENU À DROITE */
+    /* ZONE DE CONTENU */
     .main-content {
         flex: 1;
-        margin-left: var(--sidebar-width); /* Laisse la place à la sidebar */
+        margin-left: var(--sidebar-width);
         padding: 3rem;
         width: calc(100% - var(--sidebar-width));
     }
 
-    /* On garde tes styles de cartes mais on les épure */
     .glass-card {
         background: rgba(0, 0, 0, 0.6);
         border: 1px solid rgba(255, 255, 255, 0.1);
         backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
         padding: 2rem;
         height: 100%;
+        transition: transform 0.3s ease;
     }
+    
+    .glass-card:hover {
+        border-color: rgba(255, 49, 49, 0.3);
+    }
+
+    .font-bebas { font-family: 'Bebas Neue', sans-serif; }
 
     .progress {
         height: 8px;
@@ -95,122 +105,122 @@
 </style>
 
 <div class="dashboard-container">
-    {# --- SIDEBAR NAVIGATION CORRIGÉE --- #}
-    <nav class="sidebar">
-        <a href="{{ path('app_dashboard') }}" class="sidebar-brand">
+    <aside class="sidebar">
+        <a href="{{ path('app_dashboard') }}" class="sidebar-brand" aria-label="Performance ID Accueil">
             PERFORMANCE <span style="color: var(--primary-red)">ID</span>
         </a>
 
-        <div class="nav-menu">
-            {# Dashboard #}
+        <nav class="nav-menu" aria-label="Menu principal">
             <a href="{{ path('app_dashboard') }}" class="nav-link-custom {{ app.request.get('_route') == 'app_dashboard' ? 'active' : '' }}">
-                <i class="bi bi-speedometer2"></i> <span>Tableau de bord</span>
+                <i class="bi bi-speedometer2" aria-hidden="true"></i> <span>Tableau de bord</span>
             </a>
 
-            {# Historique (Entraînements) #}
             <a href="{{ path('app_workout_index') }}" class="nav-link-custom {{ app.request.get('_route') == 'app_workout_index' ? 'active' : '' }}">
-                <i class="bi bi-calendar-check"></i> <span>Historique</span>
+                <i class="bi bi-calendar-check" aria-hidden="true"></i> <span>Historique</span>
             </a>
 
-            {# Objectifs #}
             <a href="{{ path('app_goal_new') }}" class="nav-link-custom {{ app.request.get('_route') == 'app_goal_new' ? 'active' : '' }}">
-                <i class="bi bi-trophy"></i> <span>Objectifs</span>
+                <i class="bi bi-trophy" aria-hidden="true"></i> <span>Objectifs</span>
             </a>
 
-            {# Profil #}
             <a href="{{ path('app_profile') }}" class="nav-link-custom {{ app.request.get('_route') == 'app_profile' ? 'active' : '' }}">
-                <i class="bi bi-person-circle"></i> <span>Mon Profil</span>
+                <i class="bi bi-person-circle" aria-hidden="true"></i> <span>Mon Profil</span>
             </a>
-        </div>
+        </nav>
 
         <div class="mt-auto">
             <hr style="border-color: rgba(255,255,255,0.1)">
-            {# Déconnexion #}
-            <a href="{{ path('app_logout') }}" class="nav-link-custom text-danger" onclick="return confirm('Se déconnecter ?')">
-                <i class="bi bi-box-arrow-left"></i> <span>Déconnexion</span>
+            <a href="{{ path('app_logout') }}" class="nav-link-custom text-danger" onclick="return confirm('Voulez-vous vraiment vous déconnecter ?')">
+                <i class="bi bi-box-arrow-left" aria-hidden="true"></i> <span>Déconnexion</span>
             </a>
         </div>
-    </nav>
+    </aside>
 
-    {# --- CONTENU PRINCIPAL --- #}
     <main class="main-content">
         {# 1. HEADER #}
-        <div class="row mb-5 align-items-center">
-    <div class="col-md-8">
-        {# On utilise app.user.firstName au lieu de userIdentifier #}
-        <h1 class="display-5 fw-bold text-white">SALUT, {{ app.user.firstName|upper }}</h1>
-        <p class="text-danger fw-bold text-uppercase" style="letter-spacing: 2px;">Prêt pour ta prochaine performance ?</p>
-    </div>
+        <header class="row mb-5 align-items-center">
+            <div class="col-md-8">
+                <h1 class="display-5 fw-bold text-white">SALUT, {{ app.user.firstName|upper }}</h1>
+                <p class="text-danger fw-bold text-uppercase" style="letter-spacing: 2px;">Prêt pour ta prochaine performance ?</p>
+            </div>
             <div class="col-md-4 text-md-end">
                 <a href="{{ path('app_workout_new') }}" class="btn btn-danger btn-lg fw-bold rounded-0 shadow-lg px-4">
-                    <i class="bi bi-plus-circle me-2"></i>SÉANCE
+                    <i class="bi bi-plus-circle me-2" aria-hidden="true"></i>SÉANCE
                 </a>
             </div>
-        </div>
+        </header>
 
         {# 2. BLOC OBJECTIF #}
-        {% if goal %}
-        <div class="row mb-5">
-            <div class="col-12">
-                <div class="glass-card" style="border-left: 4px solid var(--primary-red);">
-                    <div class="d-flex justify-content-between align-items-end mb-3">
-                        <div>
-                            <h5 class="text-white-50 small text-uppercase mb-1">Objectif : {{ goal.exercise.name }}</h5>
-                            <h2 class="text-white m-0" style="font-family: 'Bebas Neue'; font-size: 2.5rem;">{{ goal.targetWeight }} KG</h2>
+        <section aria-labelledby="current-goal-title">
+            {% if goal %}
+            <div class="row mb-5">
+                <div class="col-12">
+                    <div class="glass-card" style="border-left: 4px solid var(--primary-red);">
+                        <div class="d-flex justify-content-between align-items-end mb-3">
+                            <div>
+                                {# Correction : Utilisation d'un h2 au lieu de h3 ou paragraphe simple pour la structure #}
+                                <h2 id="current-goal-title" class="text-white-50 small text-uppercase mb-1" style="font-size: 0.85rem;">Objectif : {{ goal.exercise.name }}</h2>
+                                <p class="text-white m-0 font-bebas" style="font-size: 2.5rem;">{{ goal.targetWeight }} KG</p>
+                            </div>
+                            <div class="text-danger fw-bold fs-3" aria-hidden="true">{{ pourcentage|round }}%</div>
                         </div>
-                        <div class="text-danger fw-bold fs-3">{{ pourcentage|round }}%</div>
-                    </div>
-                    
-                    <div class="progress">
-                        <div class="progress-bar bg-danger" id="js-progress-bar" role="progressbar" 
-                             style="width: 0%; transition: width 1s ease-in-out;"
-                             aria-valuenow="{{ pourcentage }}" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                    
-                    <div class="d-flex justify-content-between mt-3 small text-white-50">
-                        <span>Record Actuel : <strong class="text-white">{{ recordAbsolu }} kg</strong></span>
-                        <span>Cible : <strong class="text-white">{{ goal.targetWeight }} kg</strong></span>
+                        
+                        <div class="progress">
+                            <div class="progress-bar bg-danger" id="js-progress-bar" role="progressbar" 
+                                 style="width: 0%;" 
+                                 aria-valuenow="{{ pourcentage }}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="100"
+                                 aria-label="Progression de l'objectif"></div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mt-3 small">
+                            <span class="text-white-50">Record Actuel : <strong class="text-white">{{ recordAbsolu }} kg</strong></span>
+                            <span class="text-white-50">Cible : <strong class="text-white">{{ goal.targetWeight }} kg</strong></span>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        {% else %}
-        <div class="row mb-5">
-            <div class="col-12">
-                <a href="{{ path('app_goal_new') }}" class="btn btn-outline-secondary w-100 py-4 border-dashed text-uppercase text-white">
-                    <i class="bi bi-trophy me-2"></i> Aucun objectif défini - Clique ici pour en fixer un
-                </a>
+            {% else %}
+            <div class="row mb-5">
+                <div class="col-12">
+                    <h2 id="current-goal-title" class="visually-hidden">Aucun objectif</h2>
+                    <a href="{{ path('app_goal_new') }}" class="btn btn-outline-secondary w-100 py-4 border-dashed text-uppercase text-white">
+                        <i class="bi bi-trophy me-2" aria-hidden="true"></i> Aucun objectif défini - Cliquez ici
+                    </a>
+                </div>
             </div>
-        </div>
-        {% endif %}
+            {% endif %}
+        </section>
 
         {# 3. STATS #}
-        <div class="row g-4">
+        <section class="row g-4" aria-label="Statistiques globales">
             <div class="col-md-4">
-                <div class="glass-card">
-                    <div class="text-white-50 small text-uppercase fw-bold mb-2">Volume Total</div>
+                <article class="glass-card text-center">
+                    {# Correction : h2 pour respecter la hiérarchie logique après le h1 du header #}
+                    <h2 class="text-white-50 small text-uppercase fw-bold mb-2" style="font-size: 0.85rem;">Volume Total</h2>
                     <div class="h1 m-0 text-white font-bebas" style="font-size: 3rem;">
                         {{ volumeTotal|number_format(0, ',', ' ') }} <span class="fs-5 text-danger">KG</span>
                     </div>
-                </div>
+                </article>
             </div>
             <div class="col-md-4">
-                <div class="glass-card">
-                    <div class="text-white-50 small text-uppercase fw-bold mb-2">Séances / Semaine</div>
+                <article class="glass-card text-center">
+                    <h2 class="text-white-50 small text-uppercase fw-bold mb-2" style="font-size: 0.85rem;">Séances / Semaine</h2>
                     <div class="h1 m-0 text-white font-bebas" style="font-size: 3rem;">
                         {{ seancesSemaine }} <span class="fs-5 text-danger">FOIS</span>
                     </div>
-                </div>
+                </article>
             </div>
             <div class="col-md-4">
-                <div class="glass-card">
-                    <div class="text-white-50 small text-uppercase fw-bold mb-2">Record Absolu</div>
+                <article class="glass-card text-center">
+                    <h2 class="text-white-50 small text-uppercase fw-bold mb-2" style="font-size: 0.85rem;">Record Absolu</h2>
                     <div class="h1 m-0 text-white font-bebas" style="font-size: 3rem;">
                         {{ recordAbsolu }} <span class="fs-5 text-danger">KG</span>
                     </div>
-                </div>
+                </article>
             </div>
-        </div>
+        </section>
     </main>
 </div>
 {% endblock %}
@@ -220,8 +230,10 @@
     document.addEventListener('DOMContentLoaded', () => {
         const bar = document.getElementById('js-progress-bar');
         if(bar) {
-            // Animation fluide de la barre
-            setTimeout(() => { bar.style.width = "{{ pourcentage }}%"; }, 300);
+            requestAnimationFrame(() => {
+                bar.style.transition = "width 1.5s cubic-bezier(0.1, 0.5, 0.5, 1)";
+                bar.style.width = "{{ pourcentage }}%";
+            });
         }
     });
 </script>

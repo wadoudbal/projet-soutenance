@@ -2,15 +2,24 @@
 <html lang="fr">
     <head>
         <meta charset="UTF-8">
-        <title>{% block title %}PERFORMANCE ID{% endblock %}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         
-        {# --- 1. PRELOAD L'IMAGE DE FOND (CRITIQUE POUR LA VITESSE) --- #}
-        <link rel="preload" as="image" href="{{ asset('images/performance_id.webp') }}">
+        {# --- 1. SEO & IDENTITY --- #}
+        <title>{% block title %}PERFORMANCE ID{% endblock %}</title>
+        {# Une seule description unique et précise #}
+        <meta name="description" content="Performance ID : Expertise automobile, gestion de maintenance et suivi des performances énergétiques en temps réel.">
+        <meta name="robots" content="index, follow">
 
+        {# --- 2. PERFORMANCE : PRECONNECT & PRELOAD --- #}
+        {# Pré-connexion aux domaines externes pour gagner de précieuses millisecondes #}
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
         
+        {# Preload de l'image de fond (LCP) pour qu'elle commence à charger avant le CSS #}
+        <link rel="preload" as="image" href="{{ asset('images/performance_id.webp') }}">
+        
+        {# --- 3. ASSETS EXTERNES --- #}
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
         <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;700&display=swap" rel="stylesheet">
@@ -18,15 +27,15 @@
         <style>
             :root { 
                 --primary-red: #ff3131; 
-                /* On définit l'URL ici */
                 --bg-url: url("{{ asset('images/performance_id.webp') }}");
             }
 
             body { 
-                background: #000; /* Couleur de secours instantanée */
+                background: #000; 
                 color: white; 
                 font-family: 'Inter', sans-serif; 
                 margin: 0;
+                min-height: 100vh;
             }
 
             .bg-global {
@@ -35,24 +44,28 @@
                 left: 0;
                 width: 100%;
                 height: 100%;
-                /* Ajout d'une transition douce pour l'apparition */
-                transition: opacity 0.5s ease-in-out;
                 background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), var(--bg-url);
                 background-repeat: no-repeat;
                 background-position: center center;
                 background-size: cover;
                 z-index: -1;
-                /* Optimisation hardware */
+                /* Accélération matérielle */
                 transform: translateZ(0); 
-                backface-visibility: hidden;
+                will-change: transform;
             }
         </style>
         {% block stylesheets %}{% endblock %}
     </head>
     <body>
-        <div class="bg-global"></div>
-        {% block body %}{% endblock %}
+        {# aria-hidden="true" car cette div est purement décorative #}
+        <div class="bg-global" aria-hidden="true"></div>
+        
+        <main id="main-content">
+            {% block body %}{% endblock %}
+        </main>
 
+        {# --- 4. SCRIPTS --- #}
+        {# 'defer' permet de charger le script en parallèle sans bloquer le rendu HTML #}
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
         {% block javascripts %}{% endblock %}
     </body>

@@ -1,0 +1,58 @@
+services:
+  # 1. Le conteneur PHP + Apache (Mode Prod)
+  app:
+    build: . 
+    container_name: perfid_php
+    ports:
+      - "80:80"
+    volumes:
+      - .:/var/www/html:delegated
+    environment:
+      - APP_ENV=prod
+      - APP_DEBUG=0
+      - APP_SECRET=f3f6e8798600707753e18f9729864273
+      - DATABASE_URL=mysql://root:root@database:3306/perfid?serverVersion=8.0
+      - MONGODB_URL=mongodb://mongodb:27017
+    depends_on:
+      - database
+      - mongodb
+
+  # 2. MySQL
+  database:
+    image: mysql:8.0
+    container_name: perfid_mysql
+    restart: always
+    environment:
+      - MYSQL_DATABASE=perfid
+      - MYSQL_ROOT_PASSWORD=root
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
+  # 3. MongoDB
+  mongodb:
+    image: mongo:latest
+    container_name: perfid_mongo
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_DATABASE=app
+    volumes:
+      - mongodb_data:/data/db
+
+  # 4. phpMyAdmin (Syntaxe harmonisée en liste)
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: perfid_pma
+    ports:
+      - "8081:80"
+    environment:
+      - PMA_HOST=database
+      - MYSQL_ROOT_PASSWORD=root
+    depends_on:
+      - database
+
+volumes:
+  db_data:
+  mongodb_data:

@@ -4,24 +4,140 @@
     </a>
 
     <div class="nav-menu">
-        <a href="{{ path('app_dashboard') }}" class="nav-link-custom {{ app.request.get('_route') == 'app_dashboard' ? 'active' : '' }}">
-            <i class="bi bi-speedometer2"></i> <span>Dashboard</span>
+        {% set current_route = app.request.attributes.get('_route') %}
+
+        <a href="{{ path('app_dashboard') }}" class="nav-link-custom {{ current_route == 'app_dashboard' ? 'active' : '' }}">
+            <i class="bi bi-speedometer2"></i>
+            <span class="nav-text">Dashboard</span>
         </a>
-        <a href="{{ path('app_workout_index') }}" class="nav-link-custom {{ app.request.get('_route') == 'app_workout_index' ? 'active' : '' }}">
-            <i class="bi bi-calendar-check"></i> <span>Historique</span>
+        
+        <a href="{{ path('app_workout_index') }}" class="nav-link-custom {{ current_route starts with 'app_workout' ? 'active' : '' }}">
+            <i class="bi bi-calendar-check"></i>
+            <span class="nav-text">Historique</span>
         </a>
-        <a href="{{ path('app_goal_new') }}" class="nav-link-custom {{ app.request.get('_route') == 'app_goal_new' ? 'active' : '' }}">
-            <i class="bi bi-trophy"></i> <span>Objectifs</span>
+        
+        <a href="{{ path('app_goal_new') }}" class="nav-link-custom {{ current_route == 'app_goal_new' ? 'active' : '' }}">
+            <i class="bi bi-trophy"></i>
+            <span class="nav-text">Objectifs</span>
         </a>
-        <a href="{{ path('app_profile') }}" class="nav-link-custom {{ app.request.get('_route') == 'app_profile' ? 'active' : '' }}">
-            <i class="bi bi-person-circle"></i> <span>Mon Profil</span>
+        
+        <a href="{{ path('app_profile') }}" class="nav-link-custom {{ current_route == 'app_profile' ? 'active' : '' }}">
+            <i class="bi bi-person-circle"></i>
+            <span class="nav-text">Profil</span>
+        </a>
+
+        {# Déconnexion Mobile #}
+        <a href="{{ path('app_logout') }}" class="nav-link-custom text-danger d-sm-none" onclick="return confirm('Se déconnecter ?')">
+            <i class="bi bi-box-arrow-left"></i>
+            <span class="nav-text">Quitter</span>
         </a>
     </div>
 
-    <div class="mt-auto">
+    {# Déconnexion Bureau #}
+    <div class="mt-auto sidebar-footer d-none d-sm-block">
         <hr style="border-color: rgba(255,255,255,0.1)">
         <a href="{{ path('app_logout') }}" class="nav-link-custom text-danger" onclick="return confirm('Se déconnecter ?')">
-            <i class="bi bi-box-arrow-left"></i> <span>Déconnexion</span>
+            <i class="bi bi-box-arrow-left"></i>
+            <span class="nav-text">Déconnexion</span>
         </a>
     </div>
 </nav>
+
+<style>
+    :root {
+        --sidebar-width: 280px;
+        --primary-red: #ff3131;
+    }
+
+    /* --- STYLE BUREAU --- */
+    .sidebar {
+        width: var(--sidebar-width);
+        background: rgba(10, 10, 10, 0.95);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        flex-direction: column;
+        padding: 2rem 1.5rem;
+        position: fixed;
+        height: 100vh;
+        left: 0;
+        top: 0;
+        z-index: 1050;
+    }
+
+    .sidebar-brand {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 2rem;
+        color: #fff;
+        text-decoration: none;
+        margin-bottom: 3rem;
+        text-align: center;
+    }
+
+    .nav-link-custom {
+        display: flex;
+        align-items: center;
+        color: #aaa;
+        text-decoration: none;
+        padding: 1rem;
+        margin-bottom: 0.5rem;
+        border-radius: 8px;
+        transition: 0.3s;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+    }
+
+    .nav-link-custom i { font-size: 1.2rem; margin-right: 15px; }
+
+    .nav-link-custom:hover, .nav-link-custom.active {
+        background: rgba(255, 49, 49, 0.1);
+        color: var(--primary-red);
+    }
+
+    /* --- RESPONSIVE MOBILE --- */
+    @media (max-width: 576px) {
+        .sidebar {
+            width: 100% !important;
+            height: 75px !important;
+            bottom: 0 !important;
+            top: auto !important;
+            flex-direction: row !important;
+            padding: 0 !important;
+            border-right: none !important;
+            border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+        }
+
+        .sidebar-brand { display: none !important; }
+
+        .nav-menu {
+            display: flex !important;
+            width: 100% !important;
+            justify-content: space-around !important;
+            align-items: center !important;
+        }
+
+        .nav-link-custom {
+            flex-direction: column !important;
+            padding: 8px 2px !important;
+            margin: 0 !important;
+            font-size: 0.6rem !important; /* Taille réduite pour tenir sur une ligne */
+            flex: 1;
+            text-align: center;
+            border-radius: 0;
+        }
+
+        .nav-link-custom i { 
+            margin: 0 !important; 
+            font-size: 1.3rem !important; 
+            margin-bottom: 2px; 
+        }
+
+        .nav-text {
+            display: block !important; /* Force l'affichage du texte */
+            font-size: 0.6rem;
+            white-space: nowrap;
+        }
+    }
+</style>

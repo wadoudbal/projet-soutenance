@@ -6,9 +6,6 @@ use App\Entity\Workout;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-/**
- * @extends ServiceEntityRepository<Workout>
- */
 class WorkoutRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -17,54 +14,47 @@ class WorkoutRepository extends ServiceEntityRepository
     }
 
     /**
-     * Calcule le volume total (Poids * Reps * Séries) directement en base de données.
+     * RÉCUPÉRATION GROUPÉE (Optimisation Performance)
+     * Récupère le volume, le record et le nombre de sessions en UNE SEULE requête.
      */
-    public function getTotalVolumeByUser($user): float
+    public function getDashboardStats($user): array
     {
-        return (float) $this->createQueryBuilder('w')
-            ->select('SUM(w.weight * w.reps * w.serie)')
+        // On récupère les stats globales
+        $result = $this->createQueryBuilder('w')
+            // On calcule le volume : Poids * Répétitions
+            // Vérifie si c'est 'reps' ou 'serie' dans ton entité !
+            ->select('SUM(w.weight * w.reps) as totalVolume')
+            ->addSelect('MAX(w.weight) as absoluteRecord')
+            // On compte le nombre de séances différentes
+            ->addSelect('COUNT(DISTINCT w.id) as totalSessions')
             ->where('w.user = :user')
             ->setParameter('user', $user)
             ->getQuery()
-            ->getSingleScalarResult();
-    }
+            ->getOneOrNullResult();
 
-    /**
-     * Récupère la valeur maximale de la colonne weight pour cet utilisateur.
-     */
-    public function getAbsoluteRecordByUser($user): float
-    {
-        return (float) $this->createQueryBuilder('w')
-            ->select('MAX(w.weight)')
-            ->where('w.user = :user')
-            ->setParameter('user', $user)
-            ->getQuery()
-            ->getSingleScalarResult();
-    }
-
-    /**
-     * Compte le nombre de jours d'entraînement différents sur la semaine en cours.
-     */
-    public function countSessionsThisWeek($user): int
-    {
+        // Calcul spécifique pour la semaine actuelle
         $startOfWeek = new \DateTime('monday this week 00:00:00');
-        
-        return (int) $this->createQueryBuilder('w')
-            ->select('COUNT(DISTINCT SUBSTRING(w.createdAt, 1, 10))') 
+        $weeklySessions = $this->createQueryBuilder('w')
+            ->select('COUNT(DISTINCT SUBSTRING(w.createdAt, 1, 10))')
             ->where('w.user = :user')
             ->andWhere('w.createdAt >= :start')
             ->setParameter('user', $user)
             ->setParameter('start', $startOfWeek)
             ->getQuery()
             ->getSingleScalarResult();
-    }
 
+        return [
+            'totalVolume' => $result['totalVolume'] ?? 0,
+            'absoluteRecord' => $result['absoluteRecord'] ?? 0,
+            'weeklySessions' => $weeklySessions ?? 0,
+        ];
+    }
     /**
-     * Récupère le record (poids max) pour un exercice spécifique.
+     * Record spécifique (Garder séparé car dépend de l'objectif en cours)
      */
     public function getRecordForExercise($user, $exercise): float
     {
-        return (float) $this->createQueryBuilder('w')
+        $result = $this->createQueryBuilder('w')
             ->select('MAX(w.weight)')
             ->where('w.user = :user')
             ->andWhere('w.exercise = :ex')
@@ -72,5 +62,7 @@ class WorkoutRepository extends ServiceEntityRepository
             ->setParameter('ex', $exercise)
             ->getQuery()
             ->getSingleScalarResult();
+
+        return (float) ($result ?? 0);
     }
 }

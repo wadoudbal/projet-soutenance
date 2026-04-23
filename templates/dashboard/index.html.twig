@@ -1,6 +1,5 @@
 {% extends 'base.html.twig' %}
 
-{# 1. SEO Spécifique à la page #}
 {% block title %}Tableau de Bord - PERFORMANCE ID{% endblock %}
 
 {% block navbar %}{% endblock %}
@@ -18,58 +17,12 @@
         background: transparent;
     }
 
-    /* SIDEBAR */
-    .sidebar {
-        width: var(--sidebar-width);
-        background: rgba(10, 10, 10, 0.95);
-        backdrop-filter: blur(15px);
-        -webkit-backdrop-filter: blur(15px);
-        border-right: 1px solid rgba(255, 255, 255, 0.1);
-        display: flex;
-        flex-direction: column;
-        padding: 2rem 1.5rem;
-        position: fixed;
-        height: 100vh;
-        z-index: 100;
-    }
-
-    .sidebar-brand {
-        font-family: 'Bebas Neue', sans-serif;
-        font-size: 2rem;
-        color: #fff;
-        text-decoration: none;
-        margin-bottom: 3rem;
-        text-align: center;
-    }
-
-    .nav-link-custom {
-        display: flex;
-        align-items: center;
-        color: #aaa;
-        text-decoration: none;
-        padding: 1rem;
-        margin-bottom: 0.5rem;
-        border-radius: 8px;
-        transition: all 0.3s ease;
-        font-weight: 600;
-        text-transform: uppercase;
-        font-size: 0.9rem;
-    }
-
-    .nav-link-custom i { font-size: 1.2rem; margin-right: 15px; }
-
-    .nav-link-custom:hover, .nav-link-custom.active {
-        background: rgba(255, 49, 49, 0.1);
-        color: var(--primary-red);
-        transform: translateX(5px);
-    }
-
-    /* ZONE DE CONTENU */
     .main-content {
         flex: 1;
-        margin-left: var(--sidebar-width);
-        padding: 3rem;
+        margin-left: var(--sidebar-width); 
         width: calc(100% - var(--sidebar-width));
+        padding: 3rem;
+        transition: all 0.3s ease;
     }
 
     .glass-card {
@@ -82,8 +35,24 @@
         transition: transform 0.3s ease;
     }
     
-    .glass-card:hover {
-        border-color: rgba(255, 49, 49, 0.3);
+    .glass-card:hover { border-color: rgba(255, 49, 49, 0.3); }
+
+    .border-success-glow {
+        border: 2px solid #198754 !important;
+        box-shadow: 0 0 15px rgba(25, 135, 84, 0.2);
+    }
+
+    .btn-delete-goal {
+        color: rgba(255, 255, 255, 0.3);
+        transition: all 0.2s;
+        background: none;
+        border: none;
+        padding: 5px;
+    }
+
+    .btn-delete-goal:hover {
+        color: var(--primary-red);
+        transform: scale(1.2);
     }
 
     .font-bebas { font-family: 'Bebas Neue', sans-serif; }
@@ -96,127 +65,116 @@
     }
 
     @media (max-width: 992px) {
-        .sidebar { width: 80px; padding: 2rem 0.5rem; }
-        .sidebar-brand span, .nav-link-custom span { display: none; }
-        .main-content { margin-left: 80px; width: calc(100% - 80px); padding: 1.5rem; }
-        .nav-link-custom { justify-content: center; }
-        .nav-link-custom i { margin: 0; }
+        :root { --sidebar-width: 80px; }
+        .main-content { margin-left: var(--sidebar-width); width: calc(100% - var(--sidebar-width)); padding: 1.5rem; }
+    }
+
+    @media (max-width: 576px) {
+        .main-content { margin-left: 0 !important; width: 100% !important; padding: 1.5rem 1rem 100px 1rem !important; }
+        header.row { text-align: center; }
+        header.row h1 { font-size: 1.8rem !important; }
+        .w-100-mobile { width: 100% !important; }
     }
 </style>
 
 <div class="dashboard-container">
-    <aside class="sidebar">
-        <a href="{{ path('app_dashboard') }}" class="sidebar-brand" aria-label="Performance ID Accueil">
-            PERFORMANCE <span style="color: var(--primary-red)">ID</span>
-        </a>
-
-        <nav class="nav-menu" aria-label="Menu principal">
-            <a href="{{ path('app_dashboard') }}" class="nav-link-custom {{ app.request.get('_route') == 'app_dashboard' ? 'active' : '' }}">
-                <i class="bi bi-speedometer2" aria-hidden="true"></i> <span>Tableau de bord</span>
-            </a>
-
-            <a href="{{ path('app_workout_index') }}" class="nav-link-custom {{ app.request.get('_route') == 'app_workout_index' ? 'active' : '' }}">
-                <i class="bi bi-calendar-check" aria-hidden="true"></i> <span>Historique</span>
-            </a>
-
-            <a href="{{ path('app_goal_new') }}" class="nav-link-custom {{ app.request.get('_route') == 'app_goal_new' ? 'active' : '' }}">
-                <i class="bi bi-trophy" aria-hidden="true"></i> <span>Objectifs</span>
-            </a>
-
-            <a href="{{ path('app_profile') }}" class="nav-link-custom {{ app.request.get('_route') == 'app_profile' ? 'active' : '' }}">
-                <i class="bi bi-person-circle" aria-hidden="true"></i> <span>Mon Profil</span>
-            </a>
-        </nav>
-
-        <div class="mt-auto">
-            <hr style="border-color: rgba(255,255,255,0.1)">
-            <a href="{{ path('app_logout') }}" class="nav-link-custom text-danger" onclick="return confirm('Voulez-vous vraiment vous déconnecter ?')">
-                <i class="bi bi-box-arrow-left" aria-hidden="true"></i> <span>Déconnexion</span>
-            </a>
-        </div>
-    </aside>
+    {{ include('_sidebar.html.twig') }}
 
     <main class="main-content">
-        {# 1. HEADER #}
         <header class="row mb-5 align-items-center">
             <div class="col-md-8">
-                <h1 class="display-5 fw-bold text-white">SALUT, {{ app.user.firstName|upper }}</h1>
-                <p class="text-danger fw-bold text-uppercase" style="letter-spacing: 2px;">Prêt pour ta prochaine performance ?</p>
+                <h1 class="display-5 fw-bold text-white">SALUT, {{ app.user.firstName|default('Athlète')|upper }}</h1>
+                <p class="text-danger fw-bold text-uppercase" style="letter-spacing: 2px;">Prêt pour ta prochaine séance ?</p>
             </div>
             <div class="col-md-4 text-md-end">
-                <a href="{{ path('app_workout_new') }}" class="btn btn-danger btn-lg fw-bold rounded-0 shadow-lg px-4">
-                    <i class="bi bi-plus-circle me-2" aria-hidden="true"></i>SÉANCE
+                <a href="{{ path('app_workout_new') }}" class="btn btn-danger btn-lg fw-bold rounded-0 shadow-lg px-4 w-100-mobile">
+                    <i class="bi bi-plus-circle me-2"></i>SÉANCE
                 </a>
             </div>
         </header>
 
-        {# 2. BLOC OBJECTIF #}
         <section aria-labelledby="current-goal-title">
             {% if goal %}
             <div class="row mb-5">
                 <div class="col-12">
-                    <div class="glass-card" style="border-left: 4px solid var(--primary-red);">
-                        <div class="d-flex justify-content-between align-items-end mb-3">
-                            <div>
-                                {# Correction : Utilisation d'un h2 au lieu de h3 ou paragraphe simple pour la structure #}
-                                <h2 id="current-goal-title" class="text-white-50 small text-uppercase mb-1" style="font-size: 0.85rem;">Objectif : {{ goal.exercise.name }}</h2>
-                                <p class="text-white m-0 font-bebas" style="font-size: 2.5rem;">{{ goal.targetWeight }} KG</p>
+                    <div class="glass-card position-relative {{ pourcentage >= 100 ? 'border-success-glow' : '' }}" style="border-left: 4px solid var(--primary-red);">
+                        
+                        {# --- BOUTON SUPPRIMER --- #}
+                        <div class="position-absolute top-0 end-0 m-3" style="z-index: 5;">
+                            <form method="post" action="{{ path('app_goal_delete', {'id': goal.id}) }}" onsubmit="return confirm('Supprimer cet objectif ?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ goal.id) }}">
+                                <button type="submit" class="btn-delete-goal" title="Supprimer l'objectif">
+                                    <i class="bi bi-trash3 fs-5"></i>
+                                </button>
+                            </form>
+                        </div>
+
+                        {% if pourcentage >= 100 %}
+                            <div class="text-center py-5">
+                                <i class="bi bi-patch-check-fill text-success mb-3" style="font-size: 3rem;"></i>
+                                <h2 class="text-white font-bebas m-0" style="font-size: 2.5rem;">OBJECTIF ATTEINT !</h2>
+                                <p class="text-white-50 mb-4"><strong>{{ goal.targetWeight }} KG</strong> sur <strong>{{ goal.exercise.name|default('Exercice') }}</strong>.</p>
+                                <a href="{{ path('app_goal_new') }}" class="btn btn-success fw-bold rounded-0 px-5">NOUVEL OBJECTIF</a>
                             </div>
-                            <div class="text-danger fw-bold fs-3" aria-hidden="true">{{ pourcentage|round }}%</div>
-                        </div>
-                        
-                        <div class="progress">
-                            <div class="progress-bar bg-danger" id="js-progress-bar" role="progressbar" 
-                                 style="width: 0%;" 
-                                 aria-valuenow="{{ pourcentage }}" 
-                                 aria-valuemin="0" 
-                                 aria-valuemax="100"
-                                 aria-label="Progression de l'objectif"></div>
-                        </div>
-                        
-                        <div class="d-flex justify-content-between mt-3 small">
-                            <span class="text-white-50">Record Actuel : <strong class="text-white">{{ recordAbsolu }} kg</strong></span>
-                            <span class="text-white-50">Cible : <strong class="text-white">{{ goal.targetWeight }} kg</strong></span>
-                        </div>
+                        {% else %}
+                            <div class="d-flex justify-content-between align-items-end mb-3 pe-4">
+                                <div>
+                                    <h2 id="current-goal-title" class="text-white-50 small text-uppercase mb-1" style="font-size: 0.75rem;">Objectif : {{ goal.exercise.name|default('Exercice') }}</h2>
+                                    <p class="text-white m-0 font-bebas" style="font-size: 2rem;">{{ goal.targetWeight }} KG</p>
+                                </div>
+                                <div class="text-danger fw-bold fs-4">{{ pourcentage|round }}%</div>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-danger" 
+                                     id="js-progress-bar" 
+                                     role="progressbar" 
+                                     style="width: 0%;" 
+                                     data-pourcentage="{{ pourcentage|default(0) }}"
+                                     aria-valuenow="{{ pourcentage }}" 
+                                     aria-valuemin="0" 
+                                     aria-valuemax="100"></div>
+                            </div>
+                            <div class="d-flex justify-content-between mt-3 small">
+                                <span class="text-white-50">Actuel : <strong class="text-white">{{ recordAbsolu|default(0) }} kg</strong></span>
+                                <span class="text-white-50">Cible : <strong class="text-white">{{ goal.targetWeight }} kg</strong></span>
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
             {% else %}
             <div class="row mb-5">
-                <div class="col-12">
-                    <h2 id="current-goal-title" class="visually-hidden">Aucun objectif</h2>
-                    <a href="{{ path('app_goal_new') }}" class="btn btn-outline-secondary w-100 py-4 border-dashed text-uppercase text-white">
-                        <i class="bi bi-trophy me-2" aria-hidden="true"></i> Aucun objectif défini - Cliquez ici
+                <div class="col-12 text-center">
+                    <a href="{{ path('app_goal_new') }}" class="glass-card d-block text-decoration-none py-4">
+                        <p class="text-white m-0 font-bebas" style="letter-spacing: 2px;">+ DÉFINIR UN OBJECTIF</p>
                     </a>
                 </div>
             </div>
             {% endif %}
         </section>
 
-        {# 3. STATS #}
-        <section class="row g-4" aria-label="Statistiques globales">
+        <section class="row g-4 mb-5">
             <div class="col-md-4">
                 <article class="glass-card text-center">
-                    {# Correction : h2 pour respecter la hiérarchie logique après le h1 du header #}
-                    <h2 class="text-white-50 small text-uppercase fw-bold mb-2" style="font-size: 0.85rem;">Volume Total</h2>
-                    <div class="h1 m-0 text-white font-bebas" style="font-size: 3rem;">
-                        {{ volumeTotal|number_format(0, ',', ' ') }} <span class="fs-5 text-danger">KG</span>
+                    <h2 class="text-white-50 small text-uppercase fw-bold mb-2">Volume Total</h2>
+                    <div class="h1 m-0 text-white font-bebas" style="font-size: 2.5rem;">
+                        {{ volumeTotal|default(0)|number_format(0, ',', ' ') }} <span class="fs-6 text-danger">KG</span>
                     </div>
                 </article>
             </div>
             <div class="col-md-4">
                 <article class="glass-card text-center">
-                    <h2 class="text-white-50 small text-uppercase fw-bold mb-2" style="font-size: 0.85rem;">Séances / Semaine</h2>
-                    <div class="h1 m-0 text-white font-bebas" style="font-size: 3rem;">
-                        {{ seancesSemaine }} <span class="fs-5 text-danger">FOIS</span>
+                    <h2 class="text-white-50 small text-uppercase fw-bold mb-2">Séances / Sem</h2>
+                    <div class="h1 m-0 text-white font-bebas" style="font-size: 2.5rem;">
+                        {{ seancesSemaine|default(0) }} <span class="fs-6 text-danger">FOIS</span>
                     </div>
                 </article>
             </div>
             <div class="col-md-4">
                 <article class="glass-card text-center">
-                    <h2 class="text-white-50 small text-uppercase fw-bold mb-2" style="font-size: 0.85rem;">Record Absolu</h2>
-                    <div class="h1 m-0 text-white font-bebas" style="font-size: 3rem;">
-                        {{ recordAbsolu }} <span class="fs-5 text-danger">KG</span>
+                    <h2 class="text-white-50 small text-uppercase fw-bold mb-2">Record Absolu</h2>
+                    <div class="h1 m-0 text-white font-bebas" style="font-size: 2.5rem;">
+                        {{ recordAbsolu|default(0) }} <span class="fs-6 text-danger">KG</span>
                     </div>
                 </article>
             </div>
@@ -230,10 +188,15 @@
     document.addEventListener('DOMContentLoaded', () => {
         const bar = document.getElementById('js-progress-bar');
         if(bar) {
-            requestAnimationFrame(() => {
+            const p = parseFloat(bar.dataset.pourcentage) || 0;
+            setTimeout(() => {
                 bar.style.transition = "width 1.5s cubic-bezier(0.1, 0.5, 0.5, 1)";
-                bar.style.width = "{{ pourcentage }}%";
-            });
+                bar.style.width = Math.min(p, 100) + "%";
+                if(p >= 100) {
+                    bar.classList.remove('bg-danger');
+                    bar.classList.add('bg-success');
+                }
+            }, 100);
         }
     });
 </script>

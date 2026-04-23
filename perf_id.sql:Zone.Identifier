@@ -1,0 +1,4 @@
+[ZoneTransfer]
+ZoneId=2
+ReferrerUrl=http://localhost/phpmyadmin5.2.3/index.php?route=/database/export&db=perf_id
+HostUrl=http://localhost/phpmyadmin5.2.3/index.php?route=/export

@@ -8,11 +8,19 @@ services:
     volumes:
       - .:/var/www/html:delegated
     environment:
-      - APP_ENV=prod
-      - APP_DEBUG=0
+      - APP_ENV=dev
+      - APP_DEBUG=1
       - APP_SECRET=f3f6e8798600707753e18f9729864273
-      - DATABASE_URL=mysql://root:root@database:3306/perfid?serverVersion=8.0
+      # Utilisation du nom de service "database" (DNS interne Docker)
+      - DATABASE_URL=mysql://root:root@database:3306/perfid?serverVersion=8.0.32&charset=utf8mb4
+      # On définit les deux variantes pour être sûr que Doctrine MongoDB le voit
       - MONGODB_URL=mongodb://mongodb:27017
+      - MONGODB_URI=mongodb://mongodb:27017
+      # FIX CRITIQUE : Empêche l'erreur 500 sur DEFAULT_URI
+      - DEFAULT_URI=http://localhost
+      # FIX CRITIQUE : Mailer pour l'inscription
+      - MAILER_DSN=null://default
+      - MESSENGER_TRANSPORT_DSN=sync://
     depends_on:
       - database
       - mongodb
@@ -29,19 +37,21 @@ services:
       - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
+    command: --skip-name-resolve
 
   # 3. MongoDB
   mongodb:
     image: mongo:latest
     container_name: perfid_mongo
+    restart: always
     ports:
       - "27017:27017"
     environment:
-      - MONGO_INITDB_DATABASE=app
+      - MONGO_INITDB_DATABASE=perfid_logs
     volumes:
       - mongodb_data:/data/db
 
-  # 4. phpMyAdmin (Syntaxe harmonisée en liste)
+  # 4. phpMyAdmin
   phpmyadmin:
     image: phpmyadmin:latest
     container_name: perfid_pma

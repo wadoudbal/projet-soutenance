@@ -1,63 +1,103 @@
-{% extends 'base.html.twig' %}
+{# ON ENLÈVE LE EXTENDS POUR NE PLUS HÉRITER DES LIENS DU PARENT #}
 
-{% block title %}Performance ID - Fixer un Objectif{% endblock %}
-
-{% block body %}
-<style>
-    :root { --sidebar-width: 280px; --primary-red: #ff3131; }
-    .bebas { font-family: 'Bebas Neue', cursive; letter-spacing: 1px; }
-    .dashboard-container { display: flex; min-height: 100vh; }
-
-    /* Style Sidebar (à garder ici ou mettre dans base.html.twig) */
-    .sidebar { width: var(--sidebar-width); background: rgba(10, 10, 10, 0.95); backdrop-filter: blur(15px); border-right: 1px solid rgba(255, 255, 255, 0.1); display: flex; flex-direction: column; padding: 2rem 1.5rem; position: fixed; height: 100vh; z-index: 100; }
-    .sidebar-brand { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; color: #fff; text-decoration: none; margin-bottom: 3rem; text-align: center; }
-    .nav-link-custom { display: flex; align-items: center; color: #aaa; text-decoration: none; padding: 1rem; margin-bottom: 0.5rem; border-radius: 8px; transition: 0.3s; font-weight: 600; text-transform: uppercase; font-size: 0.9rem; }
-    .nav-link-custom i { font-size: 1.2rem; margin-right: 15px; }
-    .nav-link-custom:hover, .nav-link-custom.active { background: rgba(255, 49, 49, 0.1); color: var(--primary-red); }
-
-    .main-content { flex: 1; margin-left: var(--sidebar-width); padding: 3rem; width: calc(100% - var(--sidebar-width)); display: flex; align-items: center; justify-content: center; }
-    .glass-form-card { background: rgba(0,0,0,0.7); border: 1px solid rgba(255, 49, 49, 0.3); backdrop-filter: blur(15px); padding: 3rem; width: 100%; max-width: 500px; }
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Performance ID - Fixer un Objectif</title>
     
-    @media (max-width: 992px) {
-        .sidebar { width: 80px; padding: 2rem 0.5rem; }
-        .sidebar-brand span, .nav-link-custom span { display: none; }
-        .main-content { margin-left: 80px; width: calc(100% - 80px); }
-    }
-</style>
+    {# On garde tes styles Bootstrap et Polices #}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;700&display=swap" rel="stylesheet">
 
-<div class="dashboard-container">
-    {# ON APPELLE LA SIDEBAR UNIQUE ICI #}
-    {{ include('_sidebar.html.twig') }}
+    <style>
+        :root { --primary-red: #ff3131; }
+        .bebas { font-family: 'Bebas Neue', cursive; letter-spacing: 1px; }
+        
+        body { 
+            background: #000; 
+            margin: 0; 
+            font-family: 'Inter', sans-serif;
+            overflow: hidden; 
+        }
 
-    <main class="main-content">
-        <div class="glass-form-card shadow-lg">
+        /* On recrée ton fond noir dégradé avec l'image */
+        .page-wrapper {
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), 
+                        url("{{ asset('images/performance_id.webp') }}") no-repeat center center;
+            background-size: cover;
+        }
+
+        .glass-card {
+            background: rgba(15, 15, 15, 0.95);
+            border: 1px solid rgba(255, 49, 49, 0.3);
+            backdrop-filter: blur(15px);
+            padding: 3rem;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 0 40px rgba(0,0,0,0.5);
+        }
+
+        .form-control, .form-select {
+            background-color: #1a1a1a !important;
+            border: 1px solid #333 !important;
+            color: white !important;
+            border-radius: 0;
+            padding: 12px;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-red) !important;
+            box-shadow: 0 0 10px rgba(255, 49, 49, 0.2);
+        }
+
+        label { color: rgba(255,255,255,0.6); font-size: 0.75rem; font-weight: bold; margin-bottom: 8px; }
+    </style>
+</head>
+<body>
+
+    <div class="page-wrapper">
+        <div class="glass-card">
             <div class="text-center mb-5">
                 <h1 class="text-white bebas m-0" style="font-size: 2.5rem;">FIXER UN <span class="text-danger">OBJECTIF</span></h1>
-                <p class="text-white-50 small text-uppercase" style="letter-spacing: 1px;">Définit ton prochain palier de force</p>
+                <p class="text-white-50 small text-uppercase">Définit ton prochain palier de force</p>
             </div>
 
             {{ form_start(form) }}
                 <div class="mb-4">
-                    <label class="text-white-50 small text-uppercase fw-bold mb-2">Choisir l'exercice</label>
-                    {{ form_widget(form.exercise, {'attr': {'class': 'form-select bg-dark text-white border-secondary rounded-0 py-3'}}) }}
+                    <label>CHOISIR L'EXERCICE</label>
+                    {{ form_widget(form.exercise, {'attr': {'class': 'form-select'}}) }}
                 </div>
 
                 <div class="mb-4">
-                    <label class="text-white-50 small text-uppercase fw-bold mb-2">Poids cible (KG)</label>
-                    {{ form_widget(form.targetWeight, {'attr': {'class': 'form-control bg-dark text-white border-secondary rounded-0 py-3', 'placeholder': 'Ex: 100'}}) }}
+                    <label>POIDS CIBLE (KG)</label>
+                    {{ form_widget(form.targetWeight, {'attr': {'class': 'form-control', 'placeholder': 'Ex: 100'}}) }}
                 </div>
 
-                <button type="submit" class="btn btn-danger w-100 py-3 fw-bold rounded-0 bebas fs-4 shadow-lg">
+                <div class="mb-4">
+                    <label>ATTEINDRE AVANT LE</label>
+                    {{ form_widget(form.deadline, {'attr': {'class': 'form-control'}}) }}
+                </div>
+
+                <button type="submit" class="btn btn-danger w-100 py-3 fw-bold rounded-0 bebas fs-4">
                     <i class="bi bi-fire me-2"></i>ACTIVER L'OBJECTIF
                 </button>
             {{ form_end(form) }}
 
             <div class="text-center mt-4">
-                <a href="{{ path('app_dashboard') }}" class="text-white-50 small text-decoration-none">
-                    <i class="bi bi-arrow-left"></i> Retour au tableau de bord
+                <a href="{{ path('app_home') }}" class="text-white-50 small text-decoration-none">
+                    <i class="bi bi-arrow-left"></i> Retour à l'accueil
                 </a>
             </div>
         </div>
-    </main>
-</div>
-{% endblock %}
+    </div>
+
+</body>
+</html>

@@ -62,4 +62,16 @@ class Goal
 
         return $this;
     }
+    private ?\DateTimeInterface $deadline = null;
+
+    public function getDeadline(): ?\DateTimeInterface
+    {
+        return $this->deadline;
+    }
+    public function setDeadline(?\DateTimeInterface $deadline): self
+    {
+        $this->deadline = $deadline;
+        return $this;
+    }
 }
+
